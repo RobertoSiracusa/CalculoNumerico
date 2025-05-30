@@ -45,7 +45,7 @@ def generate_scalable_bin_file_v3(file_name="", num_lines=0, max_numbers_per_lin
 if __name__ == "__main__":
     generate_scalable_bin_file_v3(
         file_name="random_representation_numbers.bin",
-        num_lines=10,
-        max_numbers_per_line=10,
+        num_lines=100,
+        max_numbers_per_line=100,
         number_range=(0, 65535)
     )

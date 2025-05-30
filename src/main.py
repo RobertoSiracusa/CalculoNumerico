@@ -1,95 +1,49 @@
-import struct
+import NumSF
 
-def generate_binary_file(filename="numbers.bin"):
-    """
-    Generates a binary file named 'numbers.bin' with 10 lines,
-    each containing 10 four-digit decimal numbers separated by '#'.
-    """
-    with open(filename, 'wb') as f:
-        for _ in range(10):  # 10 lines
-            line_bytes = b""
-            for i in range(10):  # 10 numbers per line
-                # Generate a 4-digit number (0000-9999)
-                # You can modify this to generate random numbers or specific sequences
-                number = i * 100 + _ * 10 + 1 # Example: 0001, 0011, 0021... up to 9991
-                if number > 9999: # Ensure number stays within 4 digits
-                    number = number % 10000
 
-                # Format the number as a 4-digit string and encode it
-                line_bytes += f"{number:04d}".encode('ascii')
+def read_bin_file_to_2d_array(file_name=""):
 
-                if i < 9: # Add '#' delimiter between numbers
-                    line_bytes += b'#'
-            
-            line_bytes += b'\n' # Add newline character at the end of each line
-            f.write(line_bytes)
-    print(f"File '{filename}' created successfully.")
-
-# Run the function to create the file
-generate_binary_file()
-
-def contar_cifras_significativas(numero_str):
-    """
-    Cuenta el número de cifras significativas en una cadena de número.
-    Asume que la cadena es un número entero con posibles ceros a la izquierda.
-    Los ceros a la izquierda no se consideran significativos.
-    """
-    numero_limpio = numero_str.lstrip('0') # Elimina los ceros a la izquierda
-    
-    if not numero_limpio: # Si el número_limpio está vacío (ej. "0000"), significa que el número original era 0
-        return 1 # El número 0 tiene una cifra significativa (el mismo cero)
-    else:
-        return len(numero_limpio) # La longitud de la cadena sin ceros a la izquierda es el número de cifras significativas
-
-def leer_y_analizar_bin(nombre_archivo="numeros.bin"):
-    """
-    Lee el archivo binario generado, extrae los números y cuenta sus cifras significativas.
-    """
+    all_lines_numbers = []
     try:
-        with open(nombre_archivo, 'rb') as f:
-            contenido_bytes = f.read()
-            contenido_str = contenido_bytes.decode('utf-8') # Decodifica los bytes a una cadena UTF-8
+        with open(file_name, "rb") as f:
+            for line_bytes in f:
 
-            lineas = contenido_str.strip().split('\n') # Divide el contenido en líneas
+                line_str = line_bytes.decode('utf-8').strip()
+                
 
-            resultados = []
-            for i, linea in enumerate(lineas):
-                numeros_en_linea = linea.split('#') # Divide la línea en números usando '#' como delimitador
-                # El último split puede generar una cadena vacía si la línea termina en '#',
-                # así que la filtramos. Si tu generador no deja el último '#' en la línea,
-                # puedes quitar el filtro `filter(None, ...)`
-                numeros_en_linea = list(filter(None, numeros_en_linea)) 
-
-                for j, num_str in enumerate(numeros_en_linea):
-                    cifras = contar_cifras_significativas(num_str)
-                    resultados.append({
-                        'linea': i + 1,
-                        'posicion_en_linea': j + 1,
-                        'numero_original': num_str,
-                        'cifras_significativas': cifras
-                    })
-        return resultados
-
+                numbers_in_line = line_str.split('#')
+                
+                all_lines_numbers.append(numbers_in_line)
     except FileNotFoundError:
-        print(f"Error: El archivo '{nombre_archivo}' no fue encontrado.")
+        print(f"Error: File '{file_name}' not found.")
         return []
     except Exception as e:
-        print(f"Ocurrió un error al leer o procesar el archivo: {e}")
+        print(f"An error occurred while reading the file: {e}")
         return []
 
-# --- Ejemplo de uso ---
-if __name__ == "__main__":
-    # Asegúrate de que el archivo 'numeros.bin' exista en el mismo directorio
-    # donde ejecutas este script, o proporciona la ruta completa al archivo.
+    return all_lines_numbers
+
+def operarArray(array_2d):
+    if array_2d !=None and len(array_2d) > 0:
+        for i, line in enumerate(array_2d):
+            for j, number_str in enumerate(line):
+                object = NumSF.NumSF(number_str)
+                try:
+                    print(f"Línea {i+1}, Número {j+1}: {number_str} - Cifras Significativas: {object.cifras_significativas()}, Sistema: {object.numSistem}, Operaciones: {object.numOperaciones}")
+                except ValueError as ve:
+                    print(f"Línea {i+1}, Número {j+1}: Error - {ve}")
+
+    else:
+        print("El array de datos está vacío. No hay números para procesar.")
+
+def main():
+    file_name = "random_representation_numbers.bin"
+    array_2d = read_bin_file_to_2d_array(file_name)
     
-    # Primero, puedes usar el código del ejemplo anterior para crear el archivo:
-    # from generador_bin import generar_archivo_bin
-    # generar_archivo_bin() # Esto generará numeros.bin si aún no lo tienes
+    if array_2d:
+        print(f"Archivo '{file_name}' leído correctamente. Procesando números...")
+        operarArray(array_2d)
+    else:
+        print("No se encontraron números para procesar.")
 
-    analisis = leer_y_analizar_bin("numeros.bin")
-
-    if analisis:
-        print("\nAnálisis de cifras significativas:")
-        for resultado in analisis:
-            print(f"Línea {resultado['linea']}, Posición {resultado['posicion_en_linea']}: "
-                  f"Número '{resultado['numero_original']}' tiene {resultado['cifras_significativas']} cifras significativas.")
+main()
