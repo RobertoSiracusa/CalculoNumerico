@@ -1,0 +1,10 @@
+class ErrorRedondeo(ErrorAbsoluto,ErrorRelativo):
+    def __init__(self, realValue, stimatedValue):
+        ErrorAbsoluto.__init__(self, realValue, stimatedValue)
+        ErrorRelativo.__init__(self, realValue, stimatedValue)
+
+    def calcular(self):
+        valorRedondeado = round(self.stimatedValue, 3)
+        ErrorAb = ErrorAbsoluto.calcular(self,valorRedondeado)
+        errorRelative = ErrorRelativo.calcular(self,valorRedondeado)
+        return errorAb, errorRelative

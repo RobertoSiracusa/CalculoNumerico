@@ -1,0 +1,13 @@
+class ErrorAbsoluto:
+    __realValue = 15
+    __stimatedValue = 14.5
+    def __init__(self, realValue, stimatedValue):
+        self.realValue = realValue
+        self.stimatedValue = stimatedValue
+
+    def calcular(self,stimatedValue):
+        errorAb = abs(self.realValue - self.stimatedValue)
+        return errorAb
+    
+x = ErrorAbsoluto(15, 14.5)
+print(x.calcular(14.5))  # Output: 0.5
