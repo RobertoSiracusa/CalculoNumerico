@@ -1,0 +1,1 @@
+aqui se guarda el archivo .bin dado por marrugo y el que generamos nosotros con el programa!!
