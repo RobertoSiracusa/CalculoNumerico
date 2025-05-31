@@ -1,0 +1,11 @@
+from ErrorAbsoluto import ErrorAbsoluto
+
+class ErrorRedondeo(ErrorAbsoluto):
+    """Calcula error por redondeo a n decimales"""
+    def __init__(self, valor_real, valor_aproximado, decimales=3):
+        super().__init__(valor_real, valor_aproximado)
+        self.decimales = decimales
+    
+    def calcular(self):
+        valor_redondeado = round(self.valor_real, self.decimales)
+        return abs(self.valor_real - valor_redondeado)

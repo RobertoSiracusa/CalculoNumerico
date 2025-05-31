@@ -1,3 +1,10 @@
+
+
+#-----------------------------------
+"""Revisar objeto"""
+#-----------------------------------
+
+
 class ArchiveUtil:
     def __init__(self, router):
         self.router = None
@@ -80,7 +87,6 @@ class ArchiveUtil:
         return True
 
     def _isValid(self):
-        """Valida que el directorio sea accesible para lectura/escritura"""
         if not self.router:
             return False
             
@@ -103,5 +109,4 @@ class ArchiveUtil:
             return False
 
     def _removeFile(self, path):
-        """Intenta eliminar un archivo de manera manual"""
         pass
