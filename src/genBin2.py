@@ -47,5 +47,5 @@ if __name__ == "__main__":
         file_name="random_representation_numbers.bin",
         num_lines=100,
         max_numbers_per_line=100,
-        number_range=(0, 65535)
+        number_range=(-65535, 65535)
     )
