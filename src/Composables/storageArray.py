@@ -1,6 +1,6 @@
 import datetime
 import random
-import archiveUtil as ArchiveUtil
+import Repositories.archiveUtil as ArchiveUtil
 
 def saveArrayToTxt(dataArray, basePath):
     # Convertir el array numpy a formato de texto

@@ -5,7 +5,7 @@ class ArchiveUtil:
         if not router or not router.strip():
             raise ValueError("La ruta asignada no es válida.")
         self._router = None
-        self._util_directory(router)
+        self.utilDirectory(router)
     
     @property
     def router(self):
@@ -13,16 +13,16 @@ class ArchiveUtil:
     
     @router.setter
     def router(self, new_router):
-        self._util_directory(new_router)
+        self.utilDirectory(new_router)
     
-    def _util_directory(self, router):
+    def utilDirectory(self, router):
         if not os.path.exists(router):
             raise FileNotFoundError("El directorio a guardar no existe.")
         self._router = router
     
-    def get_archive(self, name_archive):
+    def getArchive(self, name_archive):
         if not name_archive or not name_archive.strip():
-            raise ValueError("EL nombre del archivo es requerido.")
+            raise ValueError("El nombre del archivo es requerido.")
         
         full_path = os.path.join(self._router, name_archive)
         if not os.path.isfile(full_path):

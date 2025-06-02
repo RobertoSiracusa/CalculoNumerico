@@ -1,7 +1,7 @@
 
 import Composables.storageArray as sA
 import Process.ProcessFunctions as pf
-import archiveUtil as ArchiveUtil
+import Repositories.archiveUtil as ArchiveUtil
 
 def main():
     path_to_compressed_file = "src/Storage"
