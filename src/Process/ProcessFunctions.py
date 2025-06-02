@@ -1,7 +1,6 @@
 import numpy as np
 import os
-import archiveUtil as ArchiveUtil
-import regCount as regCount
+
 
 
 def binNumpyArray(binaryContent,dataArray):

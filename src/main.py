@@ -1,5 +1,5 @@
 
-import numpy as np
+import Composables.storageArray as sA
 import Process.ProcessFunctions as pf
 import archiveUtil as ArchiveUtil
 
@@ -19,8 +19,10 @@ def main():
         dataArray = pf.binNumpyArray(binary_content, dataArray)
         
         pf.printArray(dataArray)
+        
+        sA.saveArrayToTxt(dataArray, path_to_compressed_file)
+        
         dataArray=None
-    
     except Exception as e:
         print(f"Error: {e}")
         
