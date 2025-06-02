@@ -1,112 +1,60 @@
-
-
-#-----------------------------------
-"""Revisar objeto"""
-#-----------------------------------
-
+import os
 
 class ArchiveUtil:
-    def __init__(self, router):
-        self.router = None
-        self.setRouter(router)
-    
-    def getRouter(self):
-        return self.router
-    
-    def getArchive(self, nameArchive):
-        if not self._isValid():
-            print("Error: El directorio no es válido")
-            return None
-            
-        try:
-            if not nameArchive or not nameArchive.strip():
-                raise ValueError("EL nombre del archivo es requerido.")
-            
-            full_path = self.router + nameArchive
-            
-            try:
-                test_file = open(full_path, 'r')
-                test_file.close()
-            except:
-                raise FileNotFoundError("El archivo no existe.")
-            
-            return open(full_path, 'r')
-            
-        except Exception as e:
-            print(f"ReadArchive-Error: {e}")
-            return None
-
-    def setRouter(self, router):
+    def __init__(self, router=""):
         if not router or not router.strip():
             raise ValueError("La ruta asignada no es válida.")
-
+        self.__router = None  
+        self.__utilDirectory(router)  
+    
+    def getRouter(self):
+        return self.__router
+    
+    def setRouter(self, newRouter):
+        self.__utilDirectory(newRouter)
+    
+    def __utilDirectory(self, router):
+        if not os.path.exists(router):
+            raise FileNotFoundError("El directorio a guardar no existe.")
+        self.__router = router
+    
+    def getArchive(self, nameArchive):
+        if not nameArchive or not nameArchive.strip():
+            raise ValueError("El nombre del archivo es requerido.")
+        
+        fullPath = os.path.join(self.__router, nameArchive)
+        if not os.path.isfile(fullPath):
+            raise FileNotFoundError("El archivo no se encontró en el directorio especificado.")
+        
         try:
-            test_path = router + ".__dir_test__"
-            test_file = open(test_path, 'w')
-            test_file.close()
-            open(test_path, 'r').close()
-            self._removeFile(test_path)
-            
-            self.router = router
-        except Exception as e:
-            raise FileNotFoundError("El directorio no es válido") from e
+            return open(fullPath, 'rb')
+        except PermissionError:
+            raise PermissionError("No se tienen permisos para leer al archivo.") 
+    
+    def setCreateArchive(self, content, nameArchive, addNewLine =False):
+        if not content or not content.strip(): 
+            raise ValueError("El contenido es requerido.")
+        if not nameArchive:
+            raise ValueError("El nombre del archivo es requerido.")
+        
+        fullPath = os.path.join(self.__router, f"{nameArchive}.txt")
+        mode = 'a' if os.path.exists(fullPath) else 'w'
 
-    def setCreateArchive(self, content, nameArchive, bool):
-        if not self._isValid():
-            print("Error: El directorio no es válido")
-            return
-            
-        try:
-            if not content or not content.strip() or not nameArchive or not nameArchive.strip():
-                raise ValueError("El contenido y el nombre del archivo son requeridos.")
-            
-            full_path = self.router + nameArchive + ".txt"
-            
-            with open(full_path, 'a') as file:
-                file.write(content)
-                if bool:
-                    file.write('\n')
-                    
-        except Exception as e:
-            print(f"CreateOrWriteArchive-Error: {e}")
-
+        with open(fullPath, mode) as file:
+            file.write(content) 
+            if addNewLine:
+                file.write('\n')
+    
     def getDirectories(self):
-        if not self._isValid():
-            print("Error: El directorio no es válido")
-            return None
-            
-        try:
-            return []
-        except Exception as e:
-            print(f"Directory-Error: {e}")
-            return None
-
+        if not os.path.exists(self.__router):
+            raise FileNotFoundError("El directorio no existe.")
+        
+        files = os.listdir(self.__router)
+        if not files:
+            raise FileNotFoundError("No se encontraron archivos.")
+        return files
+    
     def directoriesExist(self):
-        if not self._isValid():
-            return False
-        return True
-
-    def _isValid(self):
-        if not self.router:
-            return False
-            
-        try:
-            test_path = self.router + ".__validation_test__"
-            test_file = open(test_path, 'w')
-            test_file.write("test")
-            test_file.close()
-            
-            test_file = open(test_path, 'r')
-            content = test_file.read()
-            test_file.close()
-            
-            if content != "test":
-                return False
-                
-            self._removeFile(test_path)
-            return True
-        except:
-            return False
-
-    def _removeFile(self, path):
-        pass
+        if not os.path.exists(self.__router):
+            return False  
+        return bool(os.listdir(self.__router))
