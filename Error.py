@@ -6,6 +6,19 @@ class Error:
         self._realValue = self.__verify(_realValue)
         self._estimatedValue =  self.__verify(_estimatedValue)
 
+    
+    def getRealValue(self):
+        return self._realValue
+    
+    def setRealValue(self,_realValue):
+        self._realValue = self.__verify(_realValue)
+    
+    def getEstimatedValue(self):
+        return self._estimatedValue
+
+    def setEstimatedValue(self,_estimatedValue):
+        self._estimatedValue = self.__verify(_estimatedValue)
+
     def __verify(self, valueToCheck):
         if valueToCheck == None:
             raise ValueError("El valor no puede ser nulo.")
@@ -13,13 +26,6 @@ class Error:
             return valueToCheck
         else:
             raise TypeError("El valor debe ser un número (entero o flotante).")
-
-    def getRealValue(self):
-        return self._realValue
-    
-    def getEstimatedValue(self):
-        return self._estimatedValue
-    
     
     def __isNumber(self, valueToCheck):
         tipo = type(valueToCheck)
