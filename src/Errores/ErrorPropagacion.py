@@ -1,16 +1,24 @@
-from ErrorAbsoluto import ErrorAbsoluto
-
-
-
-#-----------------------------------
-"""Revisar formula de acropolis"""
-#-----------------------------------
-
+from .ErrorAbsoluto import ErrorAbsoluto
 
 
 class ErrorPropagacion(ErrorAbsoluto):
-    """Calcula error por propagación en operaciones"""
-    def calcular(self, operacion=lambda x, y: x + y):
-        resultado_real = operacion(self.valor_real, self.valor_real)
-        resultado_aprox = operacion(self.valor_aproximado, self.valor_aproximado)
-        return abs(resultado_real - resultado_aprox)
+    def __init__(self, initialValue = 1.0):
+        self.initialValue = initialValue
+        __realResult = (self.initialValue * 3)
+        __errorResult = self.resultWhitError()
+        super().__init__(__realResult, __errorResult)
+
+    def resultWhitError(self):
+        return ((self.initialValue * 0.1)*3 - 0.3 )
+    
+    def calculatePropE(self):
+        return super().calculateAE()
+
+    def showCase(self):
+        print("--------------------------------------------")
+        print("\n\tCaso de Propagación de Error:\n")
+        print("Valor inicial: ", self.initialValue)
+        print("Resultado Real: ", self._realValue)
+        print("Resultado con Error: ", self._estimatedValue)
+        print("\nError de propagación: ", self.calculatePropE())
+        print("--------------------------------------------")

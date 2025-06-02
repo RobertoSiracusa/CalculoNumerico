@@ -1,25 +1,35 @@
 class Error:
-    """Clase base abstracta para todos los tipos de error"""
-    def __init__(self, valor_real, valor_aproximado):
-        self._validar_datos(valor_real, valor_aproximado)
-        self.valor_real = valor_real
-        self.valor_aproximado = valor_aproximado
+    _realValue = 0
+    _estimatedValue = 0
+
+    def __init__(self,_realValue,_estimatedValue):
+        self._realValue = self.__verify(_realValue)
+        self._estimatedValue =  self.__verify(_estimatedValue)
+
     
-    def _validar_datos(self, real, aproximado):
-        """Validaciones base que aplican a todos los errores"""
-        if not isinstance(real, (int, float)) or not isinstance(aproximado, (int, float)):
-            raise TypeError("Ambos valores deben ser numéricos")
-        if real == 0 and hasattr(self, '_requiere_division'):
-            raise ValueError("El valor real no puede ser cero para este tipo de error")
+    def getRealValue(self):
+        return self._realValue
     
-    def calcular(self):
-        """Método abstracto que debe implementarse en clases hijas"""
-        raise NotImplementedError("Debe implementarse en subclases")
+    def setRealValue(self,_realValue):
+        self._realValue = self.__verify(_realValue)
     
-    def es_valido(self):
-        """Verifica si los datos son válidos"""
-        try:
-            self._validar_datos(self.valor_real, self.valor_aproximado)
+    def getEstimatedValue(self):
+        return self._estimatedValue
+
+    def setEstimatedValue(self,_estimatedValue):
+        self._estimatedValue = self.__verify(_estimatedValue)
+
+    def __verify(self, valueToCheck):
+        if valueToCheck == None:
+            raise ValueError("El valor no puede ser nulo.")
+        if self.__isNumber(valueToCheck):
+            return valueToCheck
+        else:
+            raise TypeError("El valor debe ser un número (entero o flotante).")
+    
+    def __isNumber(self, valueToCheck):
+        tipo = type(valueToCheck)
+        if tipo == int or tipo == float:
             return True
-        except (TypeError, ValueError):
+        else:
             return False
