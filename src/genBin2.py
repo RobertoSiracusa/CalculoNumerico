@@ -18,7 +18,10 @@ def generate_scalable_bin_file_v3(file_name="", num_lines=0, max_numbers_per_lin
             idx = 0
 
             while len(generated_decimal_numbers) < current_number_count:
-                decimal_num = random.randint(min_val, max_val)
+
+                whole_part = random.randint(min_val, max_val)
+                decimal_part=float(random.randint(0,999))/1000 
+                decimal_num= whole_part + decimal_part
 
                 if decimal_num not in generated_decimal_numbers:
                     generated_decimal_numbers.add(decimal_num)
@@ -30,9 +33,9 @@ def generate_scalable_bin_file_v3(file_name="", num_lines=0, max_numbers_per_lin
                     if chosen_system == "decimal":
                         formatted_num_part = str(decimal_num)
                     elif chosen_system == "binary":
-                        formatted_num_part = format(decimal_num, f'0{max_binary_bits}b')
+                        formatted_num_part = format(int(decimal_num), f'0{max_binary_bits}b')
                     elif chosen_system == "hexadecimal":
-                        formatted_num_part = format(decimal_num, f'0{max_hex_digits}X')
+                        formatted_num_part = format(int(decimal_num), f'0{max_hex_digits}X')
                     
                     temp_line_parts[idx] = formatted_num_part
                     idx += 1
@@ -45,7 +48,7 @@ def generate_scalable_bin_file_v3(file_name="", num_lines=0, max_numbers_per_lin
 if __name__ == "__main__":
     generate_scalable_bin_file_v3(
         file_name="random_representation_numbers.bin",
-        num_lines=100,
-        max_numbers_per_line=100,
-        number_range=(-65535, 65535)
+        num_lines=10,
+        max_numbers_per_line=10,
+        number_range=(-9999, 9999)
     )
