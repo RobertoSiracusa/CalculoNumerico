@@ -20,6 +20,8 @@ def main():
         
         pf.printArray(dataArray)
         
+        pf.processSignificantFigures(dataArray)
+        
         sA.saveArrayToTxt(dataArray, path_to_compressed_file)
         
         dataArray=None

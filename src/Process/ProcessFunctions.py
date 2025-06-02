@@ -1,6 +1,8 @@
 import numpy as np
 import os
 
+from Repositories.SF import SignificantFigures
+
 
 
 def binNumpyArray(binaryContent,dataArray):
@@ -54,3 +56,35 @@ def printArray(dataArray):
     print("\nAcceso a un elemento específico:")
     elemento = dataArray[0, 4]  # Acceder al primer elemento de la quinta columna
     print(f"\nElemento específico (Fila 1, Columna 5): {elemento}")
+    
+def processSignificantFigures(dataArray):
+    print("\nProcesando cifras significativas:")
+    for i in range(dataArray.shape[0]):
+        for j in range(dataArray.shape[1]):
+            value = dataArray[i, j]
+            if value == "%z":  # Saltar placeholders
+                continue
+            
+            # Convertir a decimal según la base
+            if value.startswith('0b'):
+                try:
+                    decimal_value = int(value, 2)
+                    sf = SignificantFigures(str(decimal_value))
+                    print(sf.toString())
+                except ValueError:
+                    print(f"Error: Valor binario inválido: {value}")
+            elif value.startswith('0x'):
+                try:
+                    decimal_value = int(value, 16)
+                    sf = SignificantFigures(str(decimal_value))
+                    print(sf.toString())
+                except ValueError:
+                    print(f"Error: Valor hexadecimal inválido: {value}")
+            else:
+                try:
+                    # Verificar si es número decimal
+                    float(value)
+                    sf = SignificantFigures(value)
+                    print(sf.toString())
+                except ValueError:
+                    print(f"Error: Valor decimal inválido: {value}")
