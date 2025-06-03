@@ -2,28 +2,25 @@
 import Composables.storageArray as sA
 import Process.ProcessFunctions as pf
 import Repositories.archiveUtil as ArchiveUtil
+import Composables.storeNumbers as storeNumbers
 
 def main():
-    path_to_compressed_file = "src/Storage"
-    file_name = 'random_representation_numbers.bin'
-
+    pathToFile = "src/Storage"
+    fileName = 'random_representation_numbers.bin'
+    
     try:
-        archive = ArchiveUtil.ArchiveUtil(path_to_compressed_file)
+        archive = ArchiveUtil.ArchiveUtil(pathToFile)
         
-        # MODIFICACIÓN: Usar contexto with para gestión automática
-        with archive.getArchive(file_name) as file:
-            binary_content = file.read()  # Leer contenido una vez
+        with archive.getArchive(fileName) as file:
+            binary_content = file.read()  
             
-        # Pasar contenido binario a las funciones
         dataArray = pf.initArray(binary_content)
         dataArray = pf.binNumpyArray(binary_content, dataArray)
         
-        pf.printArray(dataArray)
+        storeNumbers.storeSignificantFigures(dataArray, pathToFile)
+        print("Datos almacenados correctamente.")
         
-        pf.processSignificantFigures(dataArray)
-        
-        sA.saveArrayToTxt(dataArray, path_to_compressed_file)
-        
+        archive=None
         dataArray=None
     except Exception as e:
         print(f"Error: {e}")

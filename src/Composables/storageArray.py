@@ -3,22 +3,27 @@ import random
 import Repositories.archiveUtil as ArchiveUtil
 
 def saveArrayToTxt(dataArray, basePath):
-    # Convertir el array numpy a formato de texto
-    contentLines = []
-    for row in dataArray:
-        # Convertir cada fila a string separado por '#'
-        lineContent = '#'.join(str(element) for element in row)
-        contentLines.append(lineContent)
     
-    # Unir todas las líneas con saltos de línea
-    contentText = '\n'.join(contentLines)
+    contentText = ""
+    numRows = dataArray.shape[0]
+    for i in range(numRows):
+        row = dataArray[i]
+        lineContent = ""
+        num_cols = row.shape[0]
+        for j in range(num_cols):
+            lineContent += str(row[j])
+            if j < num_cols - 1:
+                lineContent += "#"
+        contentText += lineContent
+        if i < numRows - 1:
+            contentText += "\n"
+
     
-    # Generar el nombre del archivo con formato requerido
     currentDateTime = datetime.datetime.now()
     formattedDateTime = currentDateTime.strftime("%Y-%m-%d_%H-%M-%S")
     randNum = random.randint(1, 100)
-    outputFileName = f"extracted_numbers{formattedDateTime}_serial{randNum}"
+    outputFileName = f"Numeros_en_Txt_{formattedDateTime}_serial{randNum}"
+
     
-    # Usar ArchiveUtil para guardar el archivo
     archiveUtilInstance = ArchiveUtil.ArchiveUtil(basePath)
     archiveUtilInstance.set_create_archive(contentText, outputFileName, append_newline=False)

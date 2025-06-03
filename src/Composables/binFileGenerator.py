@@ -12,7 +12,7 @@ def generate_scalable_bin_file_v3(file_name="", num_lines=0, max_numbers_per_lin
 
     with open(file_name, "wb") as f:
         for _ in range(num_lines):
-            generated_decimal_numbers = set() # Usamos un set para asegurar unicidad de los VALORES DECIMALES generados
+            generated_decimal_numbers = set() 
             current_number_count = random.randint(1, max_numbers_per_line)
             temp_line_parts = [None] * current_number_count
             idx = 0
