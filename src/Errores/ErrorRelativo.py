@@ -12,6 +12,7 @@ class ErrorRelativo(ErrorAbsoluto):
         else:
             relativeError = AE / abs(self._realValue)
             return relativeError
+        
     def porcentualRE(self):
         return (self.calculateRE() * 100)
     
