@@ -1,8 +1,8 @@
 import numpy as np
-import os
 
-from Repositories.SF import SignificantFigures
-
+from Repositories.significantFigures import significantFigures
+from Repositories.numericSystem import numericSystem
+from Repositories.elementalOperations import elementalOperation
 
 
 def binNumpyArray(binaryContent,dataArray):
@@ -64,27 +64,31 @@ def processSignificantFigures(dataArray):
             value = dataArray[i, j]
             if value == "%z":  # Saltar placeholders
                 continue
-            
+            try:
+                # Crear objeto SignificantFigures y mostrar resultado
+                sf = significantFigures(value)
+                numeric_system = numericSystem(value)
+                eo= elementalOperation(value)
+                print( sf.toString()+"\n"+numeric_system.toString()+"\n"+eo.getPrintFormat()+"\n")
+            except ValueError as e:
+                print(f"Error procesando '{value}': {e}")
+                continue
             # Convertir a decimal según la base
-            if value.startswith('0b'):
-                try:
-                    decimal_value = int(value, 2)
-                    sf = SignificantFigures(str(decimal_value))
-                    print(sf.toString())
-                except ValueError:
-                    print(f"Error: Valor binario inválido: {value}")
-            elif value.startswith('0x'):
-                try:
-                    decimal_value = int(value, 16)
-                    sf = SignificantFigures(str(decimal_value))
-                    print(sf.toString())
-                except ValueError:
-                    print(f"Error: Valor hexadecimal inválido: {value}")
-            else:
-                try:
-                    # Verificar si es número decimal
-                    float(value)
-                    sf = SignificantFigures(value)
-                    print(sf.toString())
-                except ValueError:
-                    print(f"Error: Valor decimal inválido: {value}")
+            
+
+def processNumericSystem(dataArray):
+    print("\nProcesando sistemas numéricos:")
+    for i in range(dataArray.shape[0]):
+        for j in range(dataArray.shape[1]):
+            value = dataArray[i, j]
+            if value == "%z":  # Saltar placeholders
+                continue
+            
+            # Crear objeto NumericSystem y mostrar resultado
+            try:
+                numeric_system = numericSystem(value)
+                print(numeric_system)
+            except Exception as e:
+                print(f"Error procesando '{value}': {e}")
+
+    
