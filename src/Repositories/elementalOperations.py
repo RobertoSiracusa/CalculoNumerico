@@ -1,6 +1,6 @@
 # import numpy as np  # Solo se importaría si fuera necesario
 
-class NumericCalculator:
+class elementalOperation:
     def __init__(self, numberString):
         """
         Constructor que recibe un string representando un número
@@ -22,15 +22,15 @@ class NumericCalculator:
         
         # Verificar si es válido para decimal
         if self._isValidDecimal():
-            decimalOperations = "decimal : suma resta multiplicacion y division"
+            decimalOperations = "decimal : Suma Resta Multiplicacion y Division"
         
         # Verificar si es válido para binario
         if self._isValidBinary():
-            binaryOperations = "Binario : Suma Binaria Resta Binaria Multiplicación Binaria Division Binaria"
+            binaryOperations = "Binario : Suma Binaria Resta Binaria Multiplicacion Binaria Division Binaria"
         
         # Verificar si es válido para hexadecimal
         if self._isValidHexadecimal():
-            hexadecimalOperations = "Hexadecimal : Suma Hexadecimal Resta Hexadecimal Multiplicación División Hexadecimal"
+            hexadecimalOperations = "Hexadecimal : Suma Hexadecimal Resta Hexadecimal Multiplicacion Division Hexadecimal"
         
         # Construir el string final
         self._buildOperationString(decimalOperations, binaryOperations, hexadecimalOperations)
@@ -629,68 +629,15 @@ class NumericCalculator:
     
     def getPrintFormat(self):
         """
+        Devuelve una representación legible de los atributos del objeto.
+        """
+        return f"Numero: {self.numberString} | Operaciones: {self.elementalOperation}"
+    
+    def __str__(self):
+        """
         Retorna el formato de impresión completo sin salto de línea
         que indica todas las bases posibles del número y sus operaciones disponibles
         Returns:
             str: String con formato de impresión completo
         """
-        return f"Número: {self.numberString} - Operaciones disponibles: {self.elementalOperation}"
-
-# Ejemplo de uso
-if __name__ == "__main__":
-    # Crear objeto con número que funciona en múltiples bases
-    calc1 = NumericCalculator("111")
-    print(f"Número: {calc1.numberString}")
-    print(f"Operaciones disponibles: {calc1.getElementalOperation()}")
-    
-    print("\n" + "="*50 + "\n")
-    
-    # Crear objeto con número binario
-    calc2 = NumericCalculator("101.01")
-    print(f"Número: {calc2.numberString}")
-    print(f"Operaciones disponibles: {calc2.getElementalOperation()}")
-    
-    print("\n" + "="*50 + "\n")
-    
-    # Crear objeto con número hexadecimal
-    calc3 = NumericCalculator("A1F.2C")
-    print(f"Número: {calc3.numberString}")
-    print(f"Operaciones disponibles: {calc3.getElementalOperation()}")
-    
-    print("\n" + "="*50 + "\n")
-    
-    # Ejemplo de operaciones binarias
-    binCalc1 = NumericCalculator("1010")
-    binCalc2 = NumericCalculator("0110")
-    
-    if binCalc1._isValidBinary() and binCalc2._isValidBinary():
-        print("Operaciones binarias:")
-        print(f"{binCalc1.numberString} + {binCalc2.numberString} = {binCalc1.binaryAddition(binCalc2)}")
-        print(f"{binCalc1.numberString} - {binCalc2.numberString} = {binCalc1.binarySubtraction(binCalc2)}")
-        print(f"{binCalc1.numberString} * {binCalc2.numberString} = {binCalc1.binaryMultiplication(binCalc2)}")
-        print(f"{binCalc1.numberString} / {binCalc2.numberString} = {binCalc1.binaryDivision(binCalc2)}")
-    
-    print("\n" + "="*50 + "\n")
-    
-    # Ejemplo de operaciones hexadecimales
-    hexCalc1 = NumericCalculator("A")
-    hexCalc2 = NumericCalculator("5")
-    
-    if hexCalc1._isValidHexadecimal() and hexCalc2._isValidHexadecimal():
-        print("Operaciones hexadecimales:")
-        print(f"{hexCalc1.numberString} + {hexCalc2.numberString} = {hexCalc1.hexAddition(hexCalc2)}")
-        print(f"{hexCalc1.numberString} - {hexCalc2.numberString} = {hexCalc1.hexSubtraction(hexCalc2)}")
-        print(f"{hexCalc1.numberString} * {hexCalc2.numberString} = {hexCalc1.hexMultiplication(hexCalc2)}")
-        print(f"{hexCalc1.numberString} / {hexCalc2.numberString} = {hexCalc1.hexDivision(hexCalc2)}")
-    
-    print("\n" + "="*50 + "\n")
-    
-    # Ejemplo del nuevo método getPrintFormat()
-    print("Ejemplos usando el método getPrintFormat():")
-    testCalc1 = NumericCalculator("111")
-    testCalc2 = NumericCalculator("1001.11")
-    testCalc3 = NumericCalculator("ABC.5F")
-    
-    print(testCalc1.getPrintFormat())
-    print(testCalc2.getPrintFormat())
-    print(testCalc3.getPrintFormat())
+        return f"Numero: {self.numberString} - Operaciones disponibles: {self.elementalOperation}"

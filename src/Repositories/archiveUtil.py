@@ -12,40 +12,40 @@ class ArchiveUtil:
         return self._router
     
     @router.setter
-    def router(self, new_router):
-        self.utilDirectory(new_router)
+    def router(self, newRouter):
+        self.utilDirectory(newRouter)
     
     def utilDirectory(self, router):
         if not os.path.exists(router):
             raise FileNotFoundError("El directorio a guardar no existe.")
         self._router = router
     
-    def getArchive(self, name_archive):
-        if not name_archive or not name_archive.strip():
+    def getArchive(self, fileName):
+        if not fileName or not fileName.strip():
             raise ValueError("El nombre del archivo es requerido.")
         
-        full_path = os.path.join(self._router, name_archive)
-        if not os.path.isfile(full_path):
-            raise FileNotFoundError("El archivo no se encontró en el directorio especificado.")
+        fullFilePath = os.path.join(self._router, fileName)
+        if not os.path.isfile(fullFilePath):
+            raise FileNotFoundError("El archivo no se encontro en el directorio especificado.")
         
-        return open(full_path, 'rb')
+        return open(fullFilePath, 'rb')
     
-    def set_create_archive(self, content, name_archive, append_newline=False):
+    def setCreateArchive(self, content, fileName, append_newline=False):
         
         if not content or not content.strip(): 
             raise ValueError("El contenido es requerido.")
-        if not name_archive:
+        if not fileName:
             raise ValueError("El nombre del archivo es requerido.")
         
-        full_path = os.path.join(self._router, f"{name_archive}.txt")
-        mode = 'a' if os.path.exists(full_path) else 'w'
+        fullFilePath = os.path.join(self._router, f"{fileName}.txt")
+        mode = 'a' if os.path.exists(fullFilePath) else 'w'
 
-        with open(full_path, mode) as file:
+        with open(fullFilePath, mode) as file:
             file.write(content) 
             if append_newline:
                 file.write('\n')
     
-    def get_directories(self):
+    def getDirectories(self):
         if not os.path.exists(self._router):
             raise FileNotFoundError("El directorio no existe.")
         
@@ -54,7 +54,7 @@ class ArchiveUtil:
             raise FileNotFoundError("No se encontraron archivos.")
         return files
     
-    def directories_exist(self):
+    def directoriesExist(self):
         
         if not os.path.exists(self._router):
             return False  
