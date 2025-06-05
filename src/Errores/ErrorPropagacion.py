@@ -1,5 +1,4 @@
-from .ErrorAbsoluto import ErrorAbsoluto
-
+from errorAbsoluto import ErrorAbsoluto
 
 class ErrorPropagacion(ErrorAbsoluto):
     def __init__(self, initialValue = 1.0):
@@ -13,12 +12,3 @@ class ErrorPropagacion(ErrorAbsoluto):
     
     def calculatePropE(self):
         return super().calculateAE()
-
-    def showCase(self):
-        print("--------------------------------------------")
-        print("\n\tCaso de Propagación de Error:\n")
-        print("Valor inicial: ", self.initialValue)
-        print("Resultado Real: ", self._realValue)
-        print("Resultado con Error: ", self._estimatedValue)
-        print("\nError de propagación: ", self.calculatePropE())
-        print("--------------------------------------------")

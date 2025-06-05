@@ -1,4 +1,4 @@
-from .ErrorAbsoluto import ErrorAbsoluto
+from errorAbsoluto import ErrorAbsoluto
 from math import factorial, cos
 
 class ErrorTruncamiento(ErrorAbsoluto):
@@ -16,11 +16,3 @@ class ErrorTruncamiento(ErrorAbsoluto):
         for i in range(nTerms):
             suma += (-1)**i * (valueToAprox**(2*i)) / factorial(2*i)
         return suma
-    
-    def showCase(self):
-        print("\n--------------------------------------------")
-        print("\n\tCaso de Truncamiento:\n")
-        print("Valor real: ", self._realValue)
-        print("Valor truncado: ", self._estimatedValue)
-        print("\nError de truncamiento: ", self.calculateTE())
-        print("--------------------------------------------")
