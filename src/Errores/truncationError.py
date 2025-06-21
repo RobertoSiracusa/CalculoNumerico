@@ -1,7 +1,7 @@
-from errorAbsoluto import ErrorAbsoluto
+from absoluteError import AbsoluteError
 from math import factorial, cos
 
-class ErrorTruncamiento(ErrorAbsoluto):
+class TruncationError(AbsoluteError):
    
     def __init__(self,valueToAprox=0.5,nTerms=3):
         _realValue = cos(valueToAprox)

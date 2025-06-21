@@ -1,6 +1,6 @@
-from errorAbsoluto import ErrorAbsoluto
+from absoluteError import AbsoluteError
 
-class ErrorPropagacion(ErrorAbsoluto):
+class PropagationError(AbsoluteError):
     def __init__(self, initialValue = 1.0):
         self.initialValue = initialValue
         __realResult = (self.initialValue * 3)

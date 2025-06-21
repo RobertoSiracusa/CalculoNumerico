@@ -1,6 +1,6 @@
 from error import Error
 
-class ErrorAbsoluto(Error):
+class AbsoluteError(Error):
     
     def __init__(self, _realValue, _estimatedValue):
         super().__init__( _realValue, _estimatedValue)

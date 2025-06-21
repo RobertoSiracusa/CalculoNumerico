@@ -1,9 +1,9 @@
 from error import Error
-from errorAbsoluto import ErrorAbsoluto
+from absoluteError import AbsoluteError
 
-class ErrorRedondeo(ErrorAbsoluto):
-    def __init__(self, _realValue):
-        _realValue = self.__validateDigitBeforeUse(_realValue)
+class RoundingError(AbsoluteError):
+    def __init__(self, realValue):
+        _realValue = self.__validateDigitBeforeUse(realValue)
         self._roundedValue = self.__calculateRndValue(_realValue)
         super().__init__(_realValue, self._roundedValue)
 
