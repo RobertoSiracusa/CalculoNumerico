@@ -1,6 +1,6 @@
-from errorAbsoluto import ErrorAbsoluto
+from absoluteError import AbsoluteError
 
-class ErrorRelativo(ErrorAbsoluto):
+class RelativeError(AbsoluteError):
 
     def __init__(self, realValue, estimatedValue):
         super().__init__(realValue, estimatedValue)
