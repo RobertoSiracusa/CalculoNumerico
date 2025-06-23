@@ -22,20 +22,20 @@ class ArchiveUtil:
             error_msg = "El directorio a guardar no existe."
             # Solo hacer log si _router ya está inicializado (evitar recursión en constructor)
             if hasattr(self, '_router') and self._router:
-                self._logError("FileNotFoundError", error_msg, router)
+                self.logError("FileNotFoundError", error_msg)
             raise FileNotFoundError(error_msg)
         self._router = router
     
     def getArchive(self, fileName):
         if not fileName or not fileName.strip():
             error_msg = "El nombre del archivo es requerido."
-            self._logError("ValueError", error_msg, fileName)
+            self.logError("ValueError", error_msg)
             raise ValueError(error_msg)
         
         fullFilePath = os.path.join(self._router, fileName)
         if not os.path.isfile(fullFilePath):
             error_msg = "El archivo no se encontro en el directorio especificado."
-            self._logError("FileNotFoundError", error_msg, fileName, fullFilePath)
+            self.logError("FileNotFoundError", error_msg)
             raise FileNotFoundError(error_msg)
         
         return open(fullFilePath, 'rb')
@@ -47,14 +47,14 @@ class ArchiveUtil:
             # Solo hacer log si no estamos ya en proceso de logging (evitar recursión infinita)
             if booleano or not hasattr(self, '_logging_in_progress'):
                 self._logging_in_progress = True
-                self._logError("ValueError", error_msg, fileName)
+                self.logError("ValueError", error_msg)
                 delattr(self, '_logging_in_progress')
             raise ValueError(error_msg)
         if not fileName:
             error_msg = "El nombre del archivo es requerido."
             if booleano or not hasattr(self, '_logging_in_progress'):
                 self._logging_in_progress = True
-                self._logError("ValueError", error_msg, fileName)
+                self.logError("ValueError", error_msg)
                 delattr(self, '_logging_in_progress')
             raise ValueError(error_msg)
 
@@ -77,13 +77,13 @@ class ArchiveUtil:
     def getDirectories(self):
         if not os.path.exists(self._router):
             error_msg = "El directorio no existe."
-            self._logError("FileNotFoundError", error_msg, self._router)
+            self.logError("FileNotFoundError", error_msg)
             raise FileNotFoundError(error_msg)
         
         files = os.listdir(self._router)
         if not files:
             error_msg = "No se encontraron archivos."
-            self._logError("FileNotFoundError", error_msg, self._router)
+            self.logError("FileNotFoundError", error_msg)
             raise FileNotFoundError(error_msg)
         return files
     
@@ -93,34 +93,15 @@ class ArchiveUtil:
             return False  
         return bool(os.listdir(self._router))
     
-    def utilitaryNameArchive(self):
-        currentDateTime = datetime.now()
-        formattedDateTime = currentDateTime.strftime("%Y-%m-%d_%H-%M-%S")
-        randNum = random.randint(1, 99)
-        return f"ErrorSystemValues{formattedDateTime}_serial{randNum}"
-    
-    def _logError(self, error_type, error_message, fileName=None, fullPath=None):
-        """
-        Método privado para registrar errores en archivo .log
-        """
+    def logError(self, error_type, error_message):
         try:
-            # Crear timestamp
+
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            
-            # Formatear mensaje de error
-            log_entry = f"[{timestamp}] ERROR - {error_type}\n"
-            log_entry += f"  Mensaje: {error_message}\n"
-            
-            if fileName:
-                log_entry += f"  Archivo solicitado: {fileName}\n"
-            if fullPath:
-                log_entry += f"  Ruta completa: {fullPath}\n"
-            
-            log_entry += f"  Directorio de trabajo: {self._router}\n"
-            log_entry += "-" * 50 + "\n"
-            
-            # Guardar en archivo .log usando setCreateArchive con booleano=False
-            self.setCreateArchive(log_entry, "unused_name", append_newline=True, booleano=False)
+            serial = random.randint(1, 99)
+
+            log_entry = f"[{timestamp}-SERIAL_{serial}] ERROR - {error_type}\n"
+            log_entry += f"  Mensaje: {error_message}\n"         
+            self.setCreateArchive(log_entry, " ", append_newline=True, booleano=False)
             
         except Exception as log_exception:
             # Si falla el logging, no queremos que rompa la funcionalidad principal
