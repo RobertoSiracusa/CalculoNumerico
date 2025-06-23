@@ -1,6 +1,11 @@
 import numpy as np
 from datetime import datetime
-import re
+import sys
+import os
+
+# Agregar ruta para importar archiveUtil
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
+from Repositories.archiveUtil import ArchiveUtil
 
 class OperacionesElementalesMatrices:
     """
@@ -128,23 +133,123 @@ class OperacionesElementalesMatrices:
         except Exception:
             return False
     
-    # =================== VALIDACIÓN DE FÓRMULAS ===================
+    # =================== ANÁLISIS DE FÓRMULAS SIN REGEX ===================
     
-    def validar_estructura_formula(self, formula):
-        """Valida si una fórmula tiene estructura correcta"""
+    def es_digito(self, caracter):
+        """Verifica si un caracter es dígito"""
+        return caracter in '0123456789'
+    
+    def es_letra_mayuscula(self, caracter):
+        """Verifica si un caracter es letra mayúscula"""
+        return caracter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    
+    def extraer_numero_decimal(self, texto, inicio):
+        """
+        Extrae un número decimal desde la posición inicio
+        Retorna (numero_como_string, nueva_posicion)
+        """
+        pos = inicio
+        numero_str = ""
+        punto_encontrado = False
+        
+        # Extraer dígitos y punto decimal
+        while pos < len(texto):
+            char = texto[pos]
+            if self.es_digito(char):
+                numero_str += char
+                pos += 1
+            elif char == '.' and not punto_encontrado:
+                numero_str += char
+                punto_encontrado = True
+                pos += 1
+            else:
+                break
+        
+        return numero_str, pos
+    
+    def extraer_terminos_formula_manual(self, formula):
+        """
+        Extrae términos de una fórmula SIN USAR REGEX
+        Procesa manualmente caracter por caracter
+        """
+        try:
+            formula_limpia = formula.replace(" ", "")
+            terminos = []
+            pos = 0
+            
+            while pos < len(formula_limpia):
+                # Inicializar término
+                signo = "+"
+                escalar_str = ""
+                nombre_matriz = ""
+                transpuesta = False
+                
+                # Leer signo
+                if pos < len(formula_limpia) and formula_limpia[pos] in "+-":
+                    signo = formula_limpia[pos]
+                    pos += 1
+                elif len(terminos) == 0:
+                    # Primer término sin signo explícito
+                    signo = "+"
+                
+                # Leer escalar (número decimal)
+                escalar_str, pos = self.extraer_numero_decimal(formula_limpia, pos)
+                
+                # Leer nombre de matriz (una letra mayúscula)
+                if pos < len(formula_limpia) and self.es_letra_mayuscula(formula_limpia[pos]):
+                    nombre_matriz = formula_limpia[pos]
+                    pos += 1
+                else:
+                    return []  # Error: se esperaba una matriz
+                
+                # Leer transpuesta (^T)
+                if pos < len(formula_limpia) and formula_limpia[pos] == '^':
+                    pos += 1
+                    if pos < len(formula_limpia) and formula_limpia[pos] == 'T':
+                        transpuesta = True
+                        pos += 1
+                    else:
+                        return []  # Error: se esperaba T después de ^
+                
+                # Procesar escalar
+                if escalar_str == "":
+                    escalar_valor = 1.0
+                else:
+                    try:
+                        escalar_valor = float(escalar_str)
+                    except ValueError:
+                        return []  # Error: escalar inválido
+                
+                # Aplicar signo
+                if signo == "-":
+                    escalar_valor = -escalar_valor
+                
+                # Agregar término
+                terminos.append({
+                    'escalar': escalar_valor,
+                    'matriz': nombre_matriz,
+                    'transpuesta': transpuesta,
+                    'tiene_escalar_explicito': escalar_str != ""
+                })
+            
+            return terminos
+        except Exception:
+            return []
+    
+    def validar_estructura_formula_manual(self, formula):
+        """
+        Valida la estructura de una fórmula SIN USAR REGEX
+        Verifica que solo contenga elementos válidos
+        """
         try:
             formula_limpia = formula.replace(" ", "")
             
             if not formula_limpia:
                 return False
             
-            # Patrón para términos válidos: [signo][escalar][matriz][transpuesta]
-            patron_termino_valido = r'([+-]?)(\d*\.?\d*)([A-Z])(\^T)?'
-            matches = list(re.finditer(patron_termino_valido, formula_limpia))
-            terminos_validos = ''.join(match.group() for match in matches)
-            
-            # Verificar que toda la fórmula consiste solo de términos válidos
-            if formula_limpia != terminos_validos:
+            # Intentar extraer términos
+            terminos = self.extraer_terminos_formula_manual(formula)
+            if not terminos:
                 return False
             
             return True
@@ -154,12 +259,12 @@ class OperacionesElementalesMatrices:
     def validar_matrices_disponibles(self, formula):
         """Valida si todas las matrices de la fórmula están disponibles"""
         try:
-            formula_limpia = formula.replace(" ", "")
-            formula_sin_transpuestas = re.sub(r'\^T', '', formula_limpia)
-            matrices_encontradas = set(re.findall(r'[A-Z]', formula_sin_transpuestas))
+            terminos = self.extraer_terminos_formula_manual(formula)
+            if not terminos:
+                return False
             
-            for matriz in matrices_encontradas:
-                if matriz not in self.matrices_disponibles:
+            for termino in terminos:
+                if termino['matriz'] not in self.matrices_disponibles:
                     return False
             
             return True
@@ -169,11 +274,11 @@ class OperacionesElementalesMatrices:
     def validar_dimensiones_compatibles(self, formula):
         """Valida si las dimensiones de las matrices son compatibles"""
         try:
-            terminos = self.extraer_terminos_formula(formula)
+            terminos = self.extraer_terminos_formula_manual(formula)
             if not terminos:
                 return False
             
-            # Obtener dimensión esperada del primer término
+            # Calcular dimensión esperada del primer término
             primer_termino = terminos[0]
             matriz_base = self.matrices_disponibles[primer_termino['matriz']]
             
@@ -198,48 +303,12 @@ class OperacionesElementalesMatrices:
         except Exception:
             return False
     
-    # =================== PROCESAMIENTO DE FÓRMULAS ===================
-    
-    def extraer_terminos_formula(self, formula):
-        """Extrae y procesa los términos de una fórmula"""
-        try:
-            formula_limpia = formula.replace(" ", "")
-            patron_termino = r'([+-]?)(\d*\.?\d*)([A-Z])(\^T)?'
-            matches = re.findall(patron_termino, formula_limpia)
-            
-            terminos = []
-            for i, (signo, escalar_str, nombre_matriz, transpuesta_str) in enumerate(matches):
-                # Determinar escalar
-                if escalar_str == '':
-                    escalar_base = 1.0
-                else:
-                    escalar_base = float(escalar_str)
-                
-                # Aplicar signo
-                if i == 0 and signo == '':
-                    escalar_final = escalar_base
-                elif signo == '-':
-                    escalar_final = -escalar_base
-                else:
-                    escalar_final = escalar_base
-                
-                terminos.append({
-                    'escalar': escalar_final,
-                    'matriz': nombre_matriz,
-                    'transpuesta': transpuesta_str == '^T',
-                    'tiene_escalar_explicito': escalar_str != ''
-                })
-            
-            return terminos
-        except Exception:
-            return []
-    
     def evaluar_formula_interna(self, formula):
         """
         Evalúa una fórmula internamente usando operaciones elementales
         """
         try:
-            terminos = self.extraer_terminos_formula(formula)
+            terminos = self.extraer_terminos_formula_manual(formula)
             if not terminos:
                 return False
             
@@ -249,7 +318,7 @@ class OperacionesElementalesMatrices:
                 # Obtener matriz original
                 matriz_original = self.matrices_disponibles[termino['matriz']]
                 
-                # Aplicar transpuesta si es necesario (usando operación elemental)
+                # Aplicar transpuesta si es necesario
                 if termino['transpuesta']:
                     filas, columnas = matriz_original.shape
                     matriz_transpuesta = np.zeros((columnas, filas))
@@ -263,7 +332,7 @@ class OperacionesElementalesMatrices:
                 else:
                     matriz_procesada = matriz_original.copy()
                 
-                # Aplicar multiplicación escalar si es necesario (usando operación elemental)
+                # Aplicar multiplicación escalar si es necesario
                 if termino['tiene_escalar_explicito'] or termino['escalar'] != 1.0:
                     filas, columnas = matriz_procesada.shape
                     matriz_escalada = np.zeros((filas, columnas))
@@ -275,7 +344,7 @@ class OperacionesElementalesMatrices:
                     
                     matriz_procesada = matriz_escalada
                 
-                # Sumar al resultado (usando operación elemental)
+                # Sumar al resultado
                 if resultado is None:
                     resultado = matriz_procesada.copy()
                 else:
@@ -295,11 +364,11 @@ class OperacionesElementalesMatrices:
     def validar_formula(self, formula):
         """
         Función principal que valida completamente una fórmula
-        Realiza todas las operaciones elementales internamente pero solo retorna True/False
+        Ahora sin regex
         """
         try:
             # 1. Validar estructura
-            if not self.validar_estructura_formula(formula):
+            if not self.validar_estructura_formula_manual(formula):
                 return False
             
             # 2. Validar matrices disponibles
@@ -318,6 +387,16 @@ class OperacionesElementalesMatrices:
         except Exception:
             return False
     
+    # =================== FUNCIONES DE COMPATIBILIDAD ===================
+    
+    def extraer_terminos_formula(self, formula):
+        """Función de compatibilidad que usa el nuevo método manual"""
+        return self.extraer_terminos_formula_manual(formula)
+    
+    def validar_estructura_formula(self, formula):
+        """Función de compatibilidad que usa el nuevo método manual"""
+        return self.validar_estructura_formula_manual(formula)
+    
     # =================== UTILIDADES ===================
     
     def obtener_info_sistema(self):
@@ -331,3 +410,42 @@ class OperacionesElementalesMatrices:
         """Limpia todas las matrices registradas"""
         self.matrices_disponibles.clear()
         return True
+    
+    def guardar_resultados_txt(self, formulas_archivo):
+        """
+        Guarda resultados de validación en txt usando setCreateArchive
+        Lee fórmulas de un archivo y escribe: fórmula, válida o no
+        """
+        try:
+            # Leer fórmulas del archivo
+            archive_util = ArchiveUtil(".")
+            formulas = []
+            
+            with archive_util.getArchive(formulas_archivo) as archivo:
+                for linea in archivo:
+                    formula = linea.decode('utf-8').strip()
+                    if formula:
+                        formulas.append(formula)
+            
+            # Crear contenido del reporte
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            contenido = f"REPORTE VALIDACIÓN - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            contenido += "=" * 50 + "\n\n"
+            
+            # Procesar cada fórmula
+            for formula in formulas:
+                resultado = self.validar_formula(formula)
+                validez = "VÁLIDA" if resultado else "NO VÁLIDA"
+                
+                contenido += f"Fórmula: {formula}\n"
+                contenido += f"Resultado: {validez}\n"
+                contenido += "-" * 30 + "\n"
+            
+            # Guardar usando setCreateArchive
+            nombre_archivo = f"resultados_validacion_{timestamp}"
+            archive_util.setCreateArchive(contenido, nombre_archivo, append_newline=False, booleano=True)
+            
+            return f"{nombre_archivo}.txt"
+            
+        except Exception as e:
+            return None
