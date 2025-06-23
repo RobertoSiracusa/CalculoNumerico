@@ -1,4 +1,5 @@
 import numpy as np
+import archiveUtil as ArchiveUtil
 
 class GaussJordan:
     def __init__(self, augmentedMatrix: np.ndarray):
@@ -164,10 +165,15 @@ class GaussJordan:
             print("\nSolution (final independent term vector):\n", solution)
 
         return currentMatrix 
+    
+    def toString(self):
+        print("Matriz aumentada:")
 
 #---------------- EJEMPLO DE USO ----------------
 
 def main():
+    pathToFile = "src/Storage"
+    archive = ArchiveUtil.ArchiveUtil(pathToFile)
     print("\n========== EXAMPLE 1: Partial Pivoting (Standard Case) ==========")
     A1 = np.array([
         [55.8, 20.4, 17.1, 18.5, 19.2, 2500],
