@@ -1,29 +1,47 @@
 import numpy as np
-import archiveUtil as ArchiveUtil
+from archiveUtil import ArchiveUtil
 
 class GaussJordan:
-    def __init__(self, augmentedMatrix: np.ndarray):
+    def __init__(self, augmentedMatrix: np.ndarray):  
         if not isinstance(augmentedMatrix, np.ndarray):
-            raise TypeError("El parámetro 'augmentedMatrix' debe ser un array de NumPy (np.ndarray).")
+            errorMsg = "El parámetro 'augmentedMatrix' debe ser un array de NumPy (np.ndarray)."
+            ArchiveUtil.logError("TypeError", errorMsg, "")
+            raise TypeError(errorMsg)
         
         if augmentedMatrix.ndim != 2:
-            raise ValueError("La matriz aumentada debe ser bidimensional (e.g., forma (filas, columnas)).")
+            errorMsg = "La matriz aumentada debe ser bidimensional (Ejemplo: forma (filas, columnas))."
+            ArchiveUtil.logError("ValueError", errorMsg, "")
+            raise ValueError(errorMsg)
         
         if augmentedMatrix.size == 0 or augmentedMatrix.shape[0] == 0:
-            raise ValueError("La matriz aumentada no debe estar vacía (debe tener al menos una fila).")
+            errorMsg = "La matriz aumentada no debe estar vacía (debe tener al menos una fila)."
+            ArchiveUtil.logError("ValueError", errorMsg, "")
+            raise ValueError(errorMsg)
         
         if augmentedMatrix.shape[1] < 2:
-            raise ValueError("La matriz aumentada debe tener al menos 2 columnas (matriz de coeficientes A y vector de términos independientes b).")
+            errorMsg = "La matriz aumentada debe tener al menos 2 columnas (matriz de coeficientes A y vector de términos independientes b)."
+            ArchiveUtil.logError("ValueError", errorMsg, "")
+            raise ValueError(errorMsg)
 
-        # 5. Asignar la matriz y asegurar que los elementos sean flotantes
+
         self.augmentedMatrix = augmentedMatrix.astype(float)
         self.nRows, self.nCols = self.augmentedMatrix.shape
+        self.x = None
+        self.y = None
+        self.z = None
+        self.solution_strings_dict = {} 
+        self.raw_solution_values = None 
+        self.resolveMatrix()
 
         # Advertencias sobre el tamaño del sistema
         if self.nRows > self.nCols - 1:
-            print("Advertencia: El sistema puede estar sobredeterminado o no tener solución única.")
-        elif self.nRows < self.nCols - 1:
-            print("Advertencia: El sistema puede tener infinitas soluciones o ser indeterminado.")
+            errorMsg = "El sistema puede estar sobredeterminado o no tener solución única."
+            ArchiveUtil.logError("Tamaño del Sistema", errorMsg, "")
+            print(errorMsg)
+        if self.nRows < self.nCols - 1:
+            errorMsg = "El sistema puede tener infinitas soluciones o ser indeterminado."
+            ArchiveUtil.logError("Infinitas Soluciones", errorMsg, "")
+            print(errorMsg)
 
         np.set_printoptions(precision=4, suppress=False)
 
@@ -39,7 +57,6 @@ class GaussJordan:
 
         if maxIndex != k:
             self.swapRows(matrix, k, maxIndex)
-            print(f"   > Partial Pivoting: Swapped rows {k} and {maxIndex}")
         return matrix
 
     def completePivoting(self, matrix: np.ndarray, k: int) -> tuple[np.ndarray, list]:
@@ -59,20 +76,13 @@ class GaussJordan:
 
         if pivotRow != k:
             self.swapRows(matrix, k, pivotRow)
-            print(f"   > Full Pivoting: Swapped rows {k} and {pivotRow}")
 
         if pivotCol != k:
             self.swapColumns(matrix, k, pivotCol)
             swappedColumns.append((k, pivotCol))
-            print(f"   > Full Pivoting: Swapped columns {k} and {pivotCol}")
-
         return matrix, swappedColumns
 
     def scaledPivoting(self, augmentedMatrix: np.ndarray, k: int) -> np.ndarray:
-        """
-        Realiza el pivoteo escalonado para la columna k.
-        Encuentra la fila con el cociente más grande (elemento en columna k / factor de escala de la fila).
-        """
         n, m = augmentedMatrix.shape
         scaleFactors = np.zeros(n)
 
@@ -96,122 +106,158 @@ class GaussJordan:
                 rowWithMaxRatio = i
         if rowWithMaxRatio != k:
             self.swapRows(augmentedMatrix, k, rowWithMaxRatio)
-            print(f"   > Scaled Pivoting: Swapped rows {k} and {rowWithMaxRatio}")
         return augmentedMatrix
 
-    def solve(self, pivotingType: str = "partial") -> np.ndarray | None:
+    def resolveMatrix(self, pivotingType: str = "parcial") -> np.ndarray | None:
         """
         Implementa el método de Gauss-Jordan para resolver un sistema de ecuaciones lineales.
 
         Args:
             pivotingType (str): Tipo de pivoteo a aplicar:
-                                - "partial": Pivoteo parcial (por defecto).
-                                - "full": Pivoteo completo.
-                                - "scaled": Pivoteo escalonado.
+                                - "parcial": Pivoteo parcial (por defecto).
+                                - "completo": Pivoteo completo.
+                                - "escalonado": Pivoteo escalonado.
                                 - "none": No se aplica ningún pivoteo.
 
         Returns:
             np.array: La matriz en forma escalonada reducida por filas (si es posible),
                       o None si se encuentra un pivote cero inmanejable.
         """
-        currentMatrix = self.augmentedMatrix.copy() 
-        originalColumnOrder = list(range(self.nCols - 1)) if pivotingType == "full" else None
+        pathToFile = "src/Storage"
+        archive = ArchiveUtil(pathToFile)
+        outputFileName = "GaussJordan"
 
-        print(f"\n--- Starting Gauss-Jordan with {pivotingType.capitalize()} Pivoting ---")
-        print("Initial Matrix:\n", currentMatrix)
+        currentMatrix = self.augmentedMatrix
+        
+        # Reiniciar los atributos de solución para una nueva ejecución
+        self.x_solution = "No resuelto"
+        self.y_solution = "No resuelto"
+        self.z_solution = "No resuelto"
+        self.solution_strings_dict = {} 
+        self.raw_solution_values = None
+
+        # Usamos np.arange en lugar de list(range())
+        originalColumnOrder = np.arange(self.nCols - 1) if pivotingType == "full" else None
+
+        text = (f"\n--- Comenzando Gauss-Jordan con Pivoeteo {pivotingType.capitalize()} ---")
+        archive.setCreateArchive(text, outputFileName, append_newline=True)
+
+        # Asegúrate de que ArchiveUtil.setCreateArchive pueda manejar directamente un numpy array convertido a string
+        text_matrix = (f"Matriz Inicial:\n{currentMatrix}") 
+        archive.setCreateArchive(text_matrix, outputFileName, append_newline=True)
 
         for k in range(self.nRows):
-            print(f"\n--- Iteration {k+1} (Pivot at [{k},{k}]) ---")
-
-            if pivotingType == "partial":
+            if pivotingType == "parcial":
                 currentMatrix = self.partialPivoting(currentMatrix, k)
-            elif pivotingType == "full": 
+            elif pivotingType == "completo": 
                 currentMatrix, swaps = self.completePivoting(currentMatrix, k)
                 if originalColumnOrder is not None: 
                     for col1Idx, col2Idx in swaps:
-                        originalColumnOrder[col1Idx], originalColumnOrder[col2Idx] = \
-                            originalColumnOrder[col2Idx], originalColumnOrder[col1Idx]
-            elif pivotingType == "scaled":
+                        originalColumnOrder[[col1Idx, col2Idx]] = originalColumnOrder[[col2Idx, col1Idx]]
+            elif pivotingType == "escalonado":
                 currentMatrix = self.scaledPivoting(currentMatrix, k)
             elif pivotingType != "none":
-                print(f"Warning: Pivoting type '{pivotingType}' not recognized. No pivoting will be applied.")
-
+                errorMsg = "Tipo de pivoteo '{pivotingType}' no reconocido. No se aplicara el pivoteo"
+                ArchiveUtil.logError("ValueError", errorMsg, "")
+                raise ValueError(errorMsg)
+                
             pivot = currentMatrix[k, k]
 
             if abs(pivot) < 1e-9: 
-                print(f"Error! Zero or near-zero pivot at row {k} after pivoting. The system might not have a unique solution or be inconsistent.")
-                return None
-
+                errorMsg = "Error: Pivote igual a cero o casi cero en la fila {k} después del pivoteo. El sistema podría no tener una solución única o ser inconsistente."
+                ArchiveUtil.logError("ValueError", errorMsg, "")
+                raise ValueError(errorMsg)
+            
             currentMatrix[k, :] = currentMatrix[k, :] / pivot
-            print(f"   > Row {k} divided by pivot ({pivot:.4f}):\n", currentMatrix)
 
             for i in range(self.nRows):
-                if i != k: # For all other rows
+                if i != k:
                     factor = currentMatrix[i, k]
                     currentMatrix[i, :] = currentMatrix[i, :] - factor * currentMatrix[k, :]
-                    print(f"   > Row {i} - {factor:.4f} * Row {k}:\n", currentMatrix)
 
-        print("\n--- Gauss-Jordan Process Finished ---")
-        print("Matrix in Reduced Row Echelon Form (result):\n", currentMatrix)
+        text = ("\n--- Proceso de Gauss-Jordan finalizado ---")
+        archive.setCreateArchive(text, outputFileName, append_newline=True)
 
-        if pivotingType == "full" and originalColumnOrder is not None: 
+        text_matrix_final = (f"Matrix in Reduced Row Echelon Form (result):\n{currentMatrix}")
+        archive.setCreateArchive(text_matrix_final, outputFileName, append_newline=True)
+
+        solution_values = None 
+
+        if pivotingType == "completo" and originalColumnOrder is not None: 
             unorderedSolution = currentMatrix[:, -1]
-            solution = np.zeros_like(unorderedSolution)
+            solution_values = np.zeros_like(unorderedSolution)
             for i, originalIdx in enumerate(originalColumnOrder):
-                solution[originalIdx] = unorderedSolution[i]
-            print("\nSolution (adjusted for column swaps):\n", solution)
+                solution_values[originalIdx] = unorderedSolution[i]
         else:
-            solution = currentMatrix[:, -1]
-            print("\nSolution (final independent term vector):\n", solution)
+            solution_values = currentMatrix[:, -1]
+        
+        self.raw_solution_values = solution_values
 
-        return currentMatrix 
-    
-    def toString(self):
-        print("Matriz aumentada:")
+        if len(solution_values) >= 3:
+            self.x = f"x = {solution_values[0]:.6f}"
+            self.y = f"y = {solution_values[1]:.6f}"
+            self.z = f"z = {solution_values[2]:.6f}"
+            
+            self.solution_strings_dict['x'] = self.x
+            self.solution_strings_dict['y'] = self.y
+            self.solution_strings_dict['z'] = self.z
 
+            final_solution_for_txt = (
+                f"\Solucion:\n"
+                f"{self.x}, "
+                f"{self.y}, "
+                f"{self.z}"
+            )
+        else:
+            self.x = "No aplicable (menos de 3 vars)"
+            self.y = "No aplicable (menos de 3 vars)"
+            self.z = "No aplicable (menos de 3 vars)"
+            self.solution_strings_dict.clear()
+            final_solution_for_txt = "\nSolución: No hay suficientes variables (se esperaban 3 para x, y, z)"
+
+        archive.setCreateArchive(final_solution_for_txt, outputFileName, append_newline=True)
+        
+        return currentMatrix
 #---------------- EJEMPLO DE USO ----------------
 
 def main():
-    pathToFile = "src/Storage"
-    archive = ArchiveUtil.ArchiveUtil(pathToFile)
     print("\n========== EXAMPLE 1: Partial Pivoting (Standard Case) ==========")
     A1 = np.array([
-        [55.8, 20.4, 17.1, 18.5, 19.2, 2500],
-        [7.8, 52.1, 12.3, 13.9, 18.5, 2000],
-        [16.4, 11.5, 46.1, 11.5, 21.3, 2500],
-        [11.7, 9.2, 14.1, 47.0, 10.4, 2000],
-        [8.3, 6.8, 10.4, 9.1, 30.6, 1000]
+        [55.8, 20.4, 17.1,2.0,3.0],
+        [7.8, 52.1, 12.3,1.0,2.0],
+        [16.4, 11.5, 46.1,0.0,10.0],
+        [26.4, 12.5, 6.1,2.0,0.0]
     ], dtype=float)
     
     solver1 = GaussJordan(A1.copy()) 
-    solver1.solve(pivotingType="partial") 
+    solver1.resolveMatrix(pivotingType="parcial") 
 
     print("\n========== EXAMPLE 2: Partial Pivoting (Avoiding Zero on Diagonal) ==========")
     solver2 = GaussJordan(A1.copy())
-    solver2.solve(pivotingType="partial")
+    solver2.resolveMatrix(pivotingType="parcial")
 
     print("\n========== EXAMPLE 3: Full Pivoting ==========")
     solver3 = GaussJordan(A1.copy())
-    solver3.solve(pivotingType="full") 
+    solver3.resolveMatrix(pivotingType="completo") 
 
     print("\n========== EXAMPLE 4: Scaled Pivoting ==========")
     solver4 = GaussJordan(A1.copy())
-    solver4.solve(pivotingType="scaled")
+    solver4.resolveMatrix(pivotingType="escalonado")
 
     print("\n========== EXAMPLE 5: No Pivoting (Can Fail) ==========")
     solver5 = GaussJordan(A1.copy())
-    solver5.solve(pivotingType="none") 
+    solver5.resolveMatrix(pivotingType="none") 
 
     print("\n========== EXAMPLE 6: Error Handling Demo ==========")
     try:
         # This will raise a TypeError
-        GaussJordan([[1,2,3],[4,5,6]]).solve() 
+        GaussJordan([[1,2,3],[4,5,6]]).resolveMatrix() 
     except TypeError as e:
         print(f"Caught expected error: {e}")
     
     try:
     
-        GaussJordan(np.array([1,2,3])).solve()
+        GaussJordan(np.array([1,2,3])).resolveMatrix()
     except ValueError as e:
         print(f"Caught expected error: {e}")
 
@@ -223,7 +269,7 @@ def main():
             [3., 4., 5.]
         ], dtype=float)
         solver_singular = GaussJordan(A_singular_problem)
-        solver_singular.solve(pivotingType="none")
+        solver_singular.resolveMatrix(pivotingType="none")
     except Exception as e: 
         print(f"Caught unexpected error during singular matrix solve: {e}")
 
