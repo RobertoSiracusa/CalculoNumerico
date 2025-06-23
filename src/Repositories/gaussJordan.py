@@ -130,9 +130,9 @@ class GaussJordan:
         currentMatrix = self.augmentedMatrix
         
         # Reiniciar los atributos de solución para una nueva ejecución
-        self.x_solution = "No resuelto"
-        self.y_solution = "No resuelto"
-        self.z_solution = "No resuelto"
+        self.x = "No resuelto"
+        self.y = "No resuelto"
+        self.z = "No resuelto"
         self.solution_strings_dict = {} 
         self.raw_solution_values = None
 
