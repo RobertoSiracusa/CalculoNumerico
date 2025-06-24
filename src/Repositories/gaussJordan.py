@@ -29,8 +29,8 @@ class GaussJordan:
         self.x = None
         self.y = None
         self.z = None
-        self.solution_strings_dict = {} 
-        self.raw_solution_values = None 
+        self.solutionStringsDict = {} 
+        self.rawSolutionValues = None 
         self.resolveMatrix()
 
         # Advertencias sobre el tamaño del sistema
@@ -109,42 +109,25 @@ class GaussJordan:
         return augmentedMatrix
 
     def resolveMatrix(self, pivotingType: str = "parcial") -> np.ndarray | None:
-        """
-        Implementa el método de Gauss-Jordan para resolver un sistema de ecuaciones lineales.
-
-        Args:
-            pivotingType (str): Tipo de pivoteo a aplicar:
-                                - "parcial": Pivoteo parcial (por defecto).
-                                - "completo": Pivoteo completo.
-                                - "escalonado": Pivoteo escalonado.
-                                - "none": No se aplica ningún pivoteo.
-
-        Returns:
-            np.array: La matriz en forma escalonada reducida por filas (si es posible),
-                      o None si se encuentra un pivote cero inmanejable.
-        """
         pathToFile = "src/Storage"
         archive = ArchiveUtil(pathToFile)
         outputFileName = "GaussJordan"
 
         currentMatrix = self.augmentedMatrix
         
-        # Reiniciar los atributos de solución para una nueva ejecución
         self.x = "No resuelto"
         self.y = "No resuelto"
         self.z = "No resuelto"
-        self.solution_strings_dict = {} 
-        self.raw_solution_values = None
+        self.solutionStringsDict = {} 
+        self.rawSolutionValues = None
 
-        # Usamos np.arange en lugar de list(range())
         originalColumnOrder = np.arange(self.nCols - 1) if pivotingType == "full" else None
 
-        text = (f"\n--- Comenzando Gauss-Jordan con Pivoeteo {pivotingType.capitalize()} ---")
+        text = (f"\n--- Comenzando Gauss-Jordan con Pivoteo {pivotingType.capitalize()} ---")
         archive.setCreateArchive(text, outputFileName, append_newline=True)
 
-        # Asegúrate de que ArchiveUtil.setCreateArchive pueda manejar directamente un numpy array convertido a string
-        text_matrix = (f"Matriz Inicial:\n{currentMatrix}") 
-        archive.setCreateArchive(text_matrix, outputFileName, append_newline=True)
+        textMatrix = (f"Matriz Inicial:\n{currentMatrix}") 
+        archive.setCreateArchive(textMatrix, outputFileName, append_newline=True)
 
         for k in range(self.nRows):
             if pivotingType == "parcial":
@@ -178,31 +161,31 @@ class GaussJordan:
         text = ("\n--- Proceso de Gauss-Jordan finalizado ---")
         archive.setCreateArchive(text, outputFileName, append_newline=True)
 
-        text_matrix_final = (f"Matrix in Reduced Row Echelon Form (result):\n{currentMatrix}")
-        archive.setCreateArchive(text_matrix_final, outputFileName, append_newline=True)
+        textMatrixFinal = (f"Representación Final de la Matriz:\n{currentMatrix}")
+        archive.setCreateArchive(textMatrixFinal, outputFileName, append_newline=True)
 
-        solution_values = None 
+        solutionValues = None 
 
         if pivotingType == "completo" and originalColumnOrder is not None: 
             unorderedSolution = currentMatrix[:, -1]
-            solution_values = np.zeros_like(unorderedSolution)
+            solutionValues = np.zeros_like(unorderedSolution)
             for i, originalIdx in enumerate(originalColumnOrder):
-                solution_values[originalIdx] = unorderedSolution[i]
+                solutionValues[originalIdx] = unorderedSolution[i]
         else:
-            solution_values = currentMatrix[:, -1]
+            solutionValues = currentMatrix[:, -1]
         
-        self.raw_solution_values = solution_values
+        self.rawSolutionValues = solutionValues
 
-        if len(solution_values) >= 3:
-            self.x = f"x = {solution_values[0]:.6f}"
-            self.y = f"y = {solution_values[1]:.6f}"
-            self.z = f"z = {solution_values[2]:.6f}"
+        if len(solutionValues) >= 3:
+            self.x = f"x = {solutionValues[0]:.6f}"
+            self.y = f"y = {solutionValues[1]:.6f}"
+            self.z = f"z = {solutionValues[2]:.6f}"
             
-            self.solution_strings_dict['x'] = self.x
-            self.solution_strings_dict['y'] = self.y
-            self.solution_strings_dict['z'] = self.z
+            self.solutionStringsDict['x'] = self.x
+            self.solutionStringsDict['y'] = self.y
+            self.solutionStringsDict['z'] = self.z
 
-            final_solution_for_txt = (
+            finalSolutionForTxt = (
                 f"\Solucion:\n"
                 f"{self.x}, "
                 f"{self.y}, "
@@ -212,10 +195,10 @@ class GaussJordan:
             self.x = "No aplicable (menos de 3 vars)"
             self.y = "No aplicable (menos de 3 vars)"
             self.z = "No aplicable (menos de 3 vars)"
-            self.solution_strings_dict.clear()
-            final_solution_for_txt = "\nSolución: No hay suficientes variables (se esperaban 3 para x, y, z)"
+            self.solutionStringsDict.clear()
+            finalSolutionForTxt = "\nSolución: No hay suficientes variables (se esperaban 3 para x, y, z)"
 
-        archive.setCreateArchive(final_solution_for_txt, outputFileName, append_newline=True)
+        archive.setCreateArchive(finalSolutionForTxt, outputFileName, append_newline=True)
         
         return currentMatrix
 #---------------- EJEMPLO DE USO ----------------
