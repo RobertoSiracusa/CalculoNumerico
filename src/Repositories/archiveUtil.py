@@ -30,7 +30,7 @@ class ArchiveUtil:
         
         return open(fullFilePath, 'rb')
     
-    def setCreateArchive(self, content, fileName, append_newline=False):
+    def setCreateArchiveTxt(self, content, fileName, append_newline=False):
         
         if not content or not content.strip(): 
             raise ValueError("El contenido es requerido.")
