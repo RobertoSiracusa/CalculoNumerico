@@ -57,14 +57,14 @@ class ArchiveUtil:
                 self.logError("ValueError", error_msg)
                 delattr(self, '_logging_in_progress')
             raise ValueError(error_msg)
-
+        
+        storage_dir = "Storage"
+        if not os.path.exists(storage_dir):
+            os.makedirs(storage_dir)
+            
         if booleano == True:
             fullFilePath = os.path.join(self._router, f"{fileName}.txt")
         else:
-            # Usar la carpeta Storage existente en lugar de crear src/Storage
-            storage_dir = "Storage"
-            if not os.path.exists(storage_dir):
-                os.makedirs(storage_dir)
             fullFilePath = os.path.join(storage_dir, "PruebaErrorSystem.log")
         
         mode = 'a' if os.path.exists(fullFilePath) else 'w'
