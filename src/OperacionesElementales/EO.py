@@ -23,109 +23,109 @@ class OperacionesElementalesMatrices:
         self.operaciones = OperacionesMatrices()
         self.validador = ValidadorFormulas()
         # Referencia directa para compatibilidad
-        self.matrices_disponibles = self.validador.matrices_disponibles
+        self.matricesDisponibles = self.validador.matricesDisponibles
     
-    def registrar_matriz(self, nombre, matriz):
+    def registrarMatriz(self, nombre, matriz):
         """Registra una matriz en el sistema"""
-        return self.validador.registrar_matriz(nombre, matriz)
+        return self.validador.registrarMatriz(nombre, matriz)
     
     # =================== OPERACIONES ELEMENTALES (DELEGADAS) ===================
     
-    def suma_matrices(self, matriz_a, matriz_b):
+    def sumaMatrices(self, matrizA, matrizB):
         """Suma dos matrices elemento por elemento"""
-        return self.operaciones.suma_matrices(matriz_a, matriz_b)
+        return self.operaciones.sumaMatrices(matrizA, matrizB)
     
-    def resta_matrices(self, matriz_a, matriz_b):
+    def restaMatrices(self, matrizA, matrizB):
         """Resta dos matrices elemento por elemento"""
-        return self.operaciones.resta_matrices(matriz_a, matriz_b)
+        return self.operaciones.restaMatrices(matrizA, matrizB)
     
-    def multiplicacion_escalar(self, matriz, escalar):
+    def multiplicacionEscalar(self, matriz, escalar):
         """Multiplica cada elemento de la matriz por el escalar"""
-        return self.operaciones.multiplicacion_escalar(matriz, escalar)
+        return self.operaciones.multiplicacionEscalar(matriz, escalar)
     
-    def multiplicacion_matrices(self, matriz_a, matriz_b):
+    def multiplicacionMatrices(self, matrizA, matrizB):
         """Multiplica dos matrices usando el algoritmo elemental"""
-        return self.operaciones.multiplicacion_matrices(matriz_a, matriz_b)
+        return self.operaciones.multiplicacionMatrices(matrizA, matrizB)
     
     def transpuesta(self, matriz):
         """Calcula la transpuesta intercambiando filas y columnas"""
         return self.operaciones.transpuesta(matriz)
     
-    def matriz_inversa(self, matriz):
+    def matrizInversa(self, matriz):
         """Calcula la matriz inversa usando el método de Gauss-Jordan"""
-        return self.operaciones.matriz_inversa(matriz)
+        return self.operaciones.matrizInversa(matriz)
     
     # =================== ANÁLISIS DE FÓRMULAS (DELEGADAS) ===================
     
-    def es_digito(self, caracter):
+    def esDigito(self, caracter):
         """Verifica si un caracter es dígito"""
-        return self.validador.es_digito(caracter)
+        return self.validador.esDigito(caracter)
     
-    def es_letra_mayuscula(self, caracter):
+    def esLetraMayuscula(self, caracter):
         """Verifica si un caracter es letra mayúscula"""
-        return self.validador.es_letra_mayuscula(caracter)
+        return self.validador.esLetraMayuscula(caracter)
     
-    def extraer_numero_decimal(self, texto, inicio):
+    def extraerNumeroDecimal(self, texto, inicio):
         """Extrae un número decimal desde la posición inicio"""
-        return self.validador.extraer_numero_decimal(texto, inicio)
+        return self.validador.extraerNumeroDecimal(texto, inicio)
     
-    def extraer_terminos_formula_manual(self, formula):
+    def extraerTerminosFormulaManual(self, formula):
         """Extrae términos de una fórmula SIN USAR REGEX"""
-        return self.validador.extraer_terminos_formula(formula)
+        return self.validador.extraerTerminosFormula(formula)
     
-    def validar_estructura_formula_manual(self, formula):
+    def validarEstructuraFormulaManual(self, formula):
         """Valida la estructura de una fórmula SIN USAR REGEX"""
-        return self.validador.validar_estructura_formula(formula)
+        return self.validador.validarEstructuraFormula(formula)
     
-    def validar_matrices_disponibles(self, formula):
+    def validarMatricesDisponibles(self, formula):
         """Valida si todas las matrices de la fórmula están disponibles"""
-        return self.validador.validar_matrices_disponibles(formula)
+        return self.validador.validarMatricesDisponibles(formula)
     
-    def validar_dimensiones_compatibles(self, formula):
+    def validarDimensionesCompatibles(self, formula):
         """Valida si las dimensiones de las matrices son compatibles"""
-        return self.validador.validar_dimensiones_compatibles(formula)
+        return self.validador.validarDimensionesCompatibles(formula)
     
-    def evaluar_formula_interna(self, formula):
+    def evaluarFormulaInterna(self, formula):
         """Evalúa una fórmula internamente usando operaciones elementales"""
-        return self.validador.evaluar_formula_interna(formula)
+        return self.validador.evaluarFormulaInterna(formula)
     
     # =================== FUNCIÓN PRINCIPAL ===================
     
-    def validar_formula(self, formula):
+    def validarFormula(self, formula):
         """Función principal que valida completamente una fórmula"""
-        return self.validador.validar_formula(formula)
+        return self.validador.validarFormula(formula)
     
     # =================== FUNCIONES DE COMPATIBILIDAD ===================
     
-    def extraer_terminos_formula(self, formula):
+    def extraerTerminosFormula(self, formula):
         """Función de compatibilidad que usa el nuevo método manual"""
-        return self.extraer_terminos_formula_manual(formula)
+        return self.extraerTerminosFormulaManual(formula)
     
-    def validar_estructura_formula(self, formula):
+    def validarEstructuraFormula(self, formula):
         """Función de compatibilidad que usa el nuevo método manual"""
-        return self.validar_estructura_formula_manual(formula)
+        return self.validarEstructuraFormulaManual(formula)
     
     # =================== UTILIDADES ===================
     
-    def obtener_info_sistema(self):
+    def obtenerInfoSistema(self):
         """Retorna información básica del sistema"""
-        return self.validador.obtener_info_sistema()
+        return self.validador.obtenerInfoSistema()
     
-    def limpiar_matrices(self):
+    def limpiarMatrices(self):
         """Limpia todas las matrices registradas"""
-        return self.validador.limpiar_matrices()
+        return self.validador.limpiarMatrices()
     
-    def guardar_resultados_txt(self, formulas_archivo):
+    def guardarResultadosTxt(self, formulasArchivo):
         """
         Guarda resultados de validación en txt usando setCreateArchive
         Lee fórmulas de un archivo y escribe: fórmula, válida o no
         """
         try:
             # Leer fórmulas del archivo
-            archive_util = ArchiveUtil(".")
+            archiveUtil = ArchiveUtil(".")
             formulas = []
             
-            with archive_util.getArchive(formulas_archivo) as archivo:
+            with archiveUtil.getArchive(formulasArchivo) as archivo:
                 for linea in archivo:
                     formula = linea.decode('utf-8').strip()
                     if formula:
@@ -138,7 +138,7 @@ class OperacionesElementalesMatrices:
             
             # Procesar cada fórmula
             for formula in formulas:
-                resultado = self.validar_formula(formula)
+                resultado = self.validarFormula(formula)
                 validez = "VÁLIDA" if resultado else "NO VÁLIDA"
                 
                 contenido += f"Fórmula: {formula}\n"
@@ -146,10 +146,10 @@ class OperacionesElementalesMatrices:
                 contenido += "-" * 30 + "\n"
             
             # Guardar usando setCreateArchive
-            nombre_archivo = f"resultados_validacion_{timestamp}"
-            archive_util.setCreateArchive(contenido, nombre_archivo, append_newline=False, booleano=True)
+            nombreArchivo = f"resultados_validacion_{timestamp}"
+            archiveUtil.setCreateArchive(contenido, nombreArchivo, append_newline=False, booleano=True)
             
-            return f"{nombre_archivo}.txt"
+            return f"{nombreArchivo}.txt"
             
         except Exception as e:
             return None 
