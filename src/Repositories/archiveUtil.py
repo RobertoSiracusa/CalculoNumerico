@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+import random
 
 class ArchiveUtil:
     def __init__(self, router=""):
@@ -17,16 +19,24 @@ class ArchiveUtil:
     
     def utilDirectory(self, router):
         if not os.path.exists(router):
-            raise FileNotFoundError("El directorio a guardar no existe.")
+            error_msg = "El directorio a guardar no existe."
+            # Solo hacer log si _router ya está inicializado (evitar recursión en constructor)
+            if hasattr(self, '_router') and self._router:
+                self.logError("FileNotFoundError", error_msg)
+            raise FileNotFoundError(error_msg)
         self._router = router
     
     def getArchive(self, fileName):
         if not fileName or not fileName.strip():
-            raise ValueError("El nombre del archivo es requerido.")
+            error_msg = "El nombre del archivo es requerido."
+            self.logError("ValueError", error_msg)
+            raise ValueError(error_msg)
         
         fullFilePath = os.path.join(self._router, fileName)
         if not os.path.isfile(fullFilePath):
-            raise FileNotFoundError("El archivo no se encontro en el directorio especificado.")
+            error_msg = "El archivo no se encontro en el directorio especificado."
+            self.logError("FileNotFoundError", error_msg)
+            raise FileNotFoundError(error_msg)
         
         return open(fullFilePath, 'rb')
 
@@ -40,13 +50,31 @@ class ArchiveUtil:
             if append_newline:
                 file.write('\n')
     def setCreateArchiveTxt(self, content, fileName, append_newline=False):
-        
         if not content or not content.strip(): 
-            raise ValueError("El contenido es requerido.")
+            error_msg = "El contenido es requerido."
+            # Solo hacer log si no estamos ya en proceso de logging (evitar recursión infinita)
+            if booleano or not hasattr(self, '_logging_in_progress'):
+                self._logging_in_progress = True
+                self.logError("ValueError", error_msg)
+                delattr(self, '_logging_in_progress')
+            raise ValueError(error_msg)
         if not fileName:
-            raise ValueError("El nombre del archivo es requerido.")
+            error_msg = "El nombre del archivo es requerido."
+            if booleano or not hasattr(self, '_logging_in_progress'):
+                self._logging_in_progress = True
+                self.logError("ValueError", error_msg)
+                delattr(self, '_logging_in_progress')
+            raise ValueError(error_msg)
         
-        fullFilePath = os.path.join(self._router, f"{fileName}.txt")
+        storage_dir = "Storage"
+        if not os.path.exists(storage_dir):
+            os.makedirs(storage_dir)
+            
+        if booleano == True:
+            fullFilePath = os.path.join(self._router, f"{fileName}.txt")
+        else:
+            fullFilePath = os.path.join(storage_dir, "PruebaErrorSystem.log")
+        
         mode = 'a' if os.path.exists(fullFilePath) else 'w'
 
         with open(fullFilePath, mode) as file:
@@ -56,11 +84,15 @@ class ArchiveUtil:
     
     def getDirectories(self):
         if not os.path.exists(self._router):
-            raise FileNotFoundError("El directorio no existe.")
+            error_msg = "El directorio no existe."
+            self.logError("FileNotFoundError", error_msg)
+            raise FileNotFoundError(error_msg)
         
         files = os.listdir(self._router)
         if not files:
-            raise FileNotFoundError("No se encontraron archivos.")
+            error_msg = "No se encontraron archivos."
+            self.logError("FileNotFoundError", error_msg)
+            raise FileNotFoundError(error_msg)
         return files
     
     def directoriesExist(self):
@@ -68,3 +100,17 @@ class ArchiveUtil:
         if not os.path.exists(self._router):
             return False  
         return bool(os.listdir(self._router))
+    
+    def logError(self, error_type, error_message):
+        try:
+
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            serial = random.randint(1, 99)
+
+            log_entry = f"[{timestamp}-SERIAL_{serial}] ERROR - {error_type}\n"
+            log_entry += f"  Mensaje: {error_message}\n"         
+            self.setCreateArchive(log_entry, " ", append_newline=True, booleano=False)
+            
+        except Exception as log_exception:
+            # Si falla el logging, no queremos que rompa la funcionalidad principal
+            print(f"Warning: No se pudo registrar el error en el log: {log_exception}")
