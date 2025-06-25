@@ -1,7 +1,7 @@
 import datetime
 import random
 import Repositories.archiveUtil as ArchiveUtil
-
+from Helpers.utils import txtWriter
 def saveArrayToTxt(dataArray, basePath):
     
     contentText = ""

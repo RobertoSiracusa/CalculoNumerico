@@ -39,9 +39,17 @@ class ArchiveUtil:
             raise FileNotFoundError(error_msg)
         
         return open(fullFilePath, 'rb')
-    
-    def setCreateArchive(self, content, fileName, append_newline=False, booleano=True):
-        
+
+    def setCreateArchiveLog(self, content, logFileName, outputLogFileName, append_newline=False):
+
+        fullFilePath = os.path.join(self._router, f"{logFileName}.log")
+        mode = 'a' if os.path.exists(fullFilePath) else 'w'
+
+        with open(fullFilePath, mode) as file:
+            file.write(outputLogFileName+content) 
+            if append_newline:
+                file.write('\n')
+    def setCreateArchiveTxt(self, content, fileName, append_newline=False):
         if not content or not content.strip(): 
             error_msg = "El contenido es requerido."
             # Solo hacer log si no estamos ya en proceso de logging (evitar recursión infinita)
