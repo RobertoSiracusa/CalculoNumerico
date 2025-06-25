@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 
 
 from Helpers.utils import logWriter
@@ -39,4 +37,3 @@ def main():
         logWriter("Error al procesar archivo: " + str(e), True)
         
 main()
->>>>>>> production
