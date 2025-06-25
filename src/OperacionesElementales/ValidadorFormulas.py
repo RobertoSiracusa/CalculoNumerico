@@ -1,306 +1,240 @@
-"""
-Módulo de Validación de Fórmulas con Matrices
-Contiene toda la lógica para analizar, validar y evaluar fórmulas
-con operaciones matriciales como A + B, 2A^T, A^-1, etc.
-"""
 import numpy as np
-from OperacionesMatrices import OperacionesMatrices
+from OperacionesMatrices import MatrixOperations
 
-
-class ValidadorFormulas:
-    """
-    Clase para validar y evaluar fórmulas con matrices
-    """
-    
+class FormulaValidator:
     def __init__(self):
-        self.matricesDisponibles = {}
-        self.operaciones = OperacionesMatrices()
+        self.availableMatrices = {}
+        self.operations = MatrixOperations()
     
-    def registrarMatriz(self, nombre, matriz):
-        """Registra una matriz en el sistema"""
+    def registerMatrix(self, name, matrix):
         try:
-            if not isinstance(matriz, np.ndarray):
-                matriz = np.array(matriz, dtype=float)
-            self.matricesDisponibles[nombre] = matriz
+            if not isinstance(matrix, np.ndarray):
+                matrix = np.array(matrix, dtype=float)
+            self.availableMatrices[name] = matrix
             return True
         except Exception:
             return False
     
-    # =================== ANÁLISIS DE FÓRMULAS SIN REGEX ===================
+    def isDigit(self, character):
+        return character in '0123456789'
     
-    def esDigito(self, caracter):
-        """Verifica si un caracter es dígito"""
-        return caracter in '0123456789'
+    def isUpperCaseLetter(self, character):
+        return character in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     
-    def esLetraMayuscula(self, caracter):
-        """Verifica si un caracter es letra mayúscula"""
-        return caracter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    
-    def extraerNumeroDecimal(self, texto, inicio):
-        """
-        Extrae un número decimal desde la posición inicio
-        Retorna (numero_como_string, nueva_posicion)
-        """
-        pos = inicio
-        numeroStr = ""
-        puntoEncontrado = False
+    def extractDecimalNumber(self, text, start):
+        pos = start
+        numberStr = ""
+        pointFound = False
         
-        # Extraer dígitos y punto decimal
-        while pos < len(texto):
-            char = texto[pos]
-            if self.esDigito(char):
-                numeroStr += char
+        while pos < len(text):
+            char = text[pos]
+            if self.isDigit(char):
+                numberStr += char
                 pos += 1
-            elif char == '.' and not puntoEncontrado:
-                numeroStr += char
-                puntoEncontrado = True
+            elif char == '.' and not pointFound:
+                numberStr += char
+                pointFound = True
                 pos += 1
             else:
                 break
         
-        return numeroStr, pos
+        return numberStr, pos
     
-    def extraerTerminosFormula(self, formula):
-        """
-        Extrae términos de una fórmula SIN USAR REGEX
-        Procesa manualmente caracter por caracter
-        """
+    def extractFormulaTerms(self, formula):
         try:
-            formulaLimpia = formula.replace(" ", "")
-            terminos = []
+            cleanFormula = formula.replace(" ", "")
+            terms = []
             pos = 0
             
-            while pos < len(formulaLimpia):
-                # Inicializar término
-                signo = "+"
-                escalarStr = ""
-                nombreMatriz = ""
-                transpuesta = False
-                inversa = False
+            while pos < len(cleanFormula):
+                sign = "+"
+                scalarStr = ""
+                matrixName = ""
+                transpose = False
+                inverse = False
                 
-                # Leer signo
-                if pos < len(formulaLimpia) and formulaLimpia[pos] in "+-":
-                    signo = formulaLimpia[pos]
+                if pos < len(cleanFormula) and cleanFormula[pos] in "+-":
+                    sign = cleanFormula[pos]
                     pos += 1
-                elif len(terminos) == 0:
-                    # Primer término sin signo explícito
-                    signo = "+"
+                elif len(terms) == 0:
+                    sign = "+"
                 
-                # Leer escalar (número decimal)
-                escalarStr, pos = self.extraerNumeroDecimal(formulaLimpia, pos)
+                scalarStr, pos = self.extractDecimalNumber(cleanFormula, pos)
                 
-                # Leer nombre de matriz (una letra mayúscula)
-                if pos < len(formulaLimpia) and self.esLetraMayuscula(formulaLimpia[pos]):
-                    nombreMatriz = formulaLimpia[pos]
+                if pos < len(cleanFormula) and self.isUpperCaseLetter(cleanFormula[pos]):
+                    matrixName = cleanFormula[pos]
                     pos += 1
                 else:
-                    return []  # Error: se esperaba una matriz
+                    return [] 
                 
-                # Leer operaciones sobre la matriz (transpuesta o inversa)
-                if pos < len(formulaLimpia) and formulaLimpia[pos] == '^':
+                if pos < len(cleanFormula) and cleanFormula[pos] == '^':
                     pos += 1
-                    if pos < len(formulaLimpia):
-                        if formulaLimpia[pos] == 'T':
-                            transpuesta = True
+                    if pos < len(cleanFormula):
+                        if cleanFormula[pos] == 'T':
+                            transpose = True
                             pos += 1
-                        elif formulaLimpia[pos] == '-' and pos + 1 < len(formulaLimpia) and formulaLimpia[pos + 1] == '1':
-                            inversa = True
+                        elif cleanFormula[pos] == '-' and pos + 1 < len(cleanFormula) and cleanFormula[pos + 1] == '1':
+                            inverse = True
                             pos += 2
                         else:
-                            return []  # Error: se esperaba T o -1 después de ^
+                            return [] 
                 
-                # Procesar escalar
-                if escalarStr == "":
-                    escalarValor = 1.0
+                if scalarStr == "":
+                    scalarValue = 1.0
                 else:
                     try:
-                        escalarValor = float(escalarStr)
+                        scalarValue = float(scalarStr)
                     except ValueError:
-                        return []  # Error: escalar inválido
+                        return [] 
+
+                if sign == "-":
+                    scalarValue = -scalarValue
                 
-                # Aplicar signo
-                if signo == "-":
-                    escalarValor = -escalarValor
-                
-                # Agregar término
-                terminos.append({
-                    'escalar': escalarValor,
-                    'matriz': nombreMatriz,
-                    'transpuesta': transpuesta,
-                    'inversa': inversa,
-                    'tieneEscalarExplicito': escalarStr != ""
+                terms.append({
+                    'escalar': scalarValue,
+                    'matriz': matrixName,
+                    'transpuesta': transpose,
+                    'inversa': inverse,
+                    'tieneEscalarExplicito': scalarStr != ""
                 })
             
-            return terminos
+            return terms
         except Exception:
             return []
     
-    def validarEstructuraFormula(self, formula):
-        """
-        Valida la estructura de una fórmula SIN USAR REGEX
-        Verifica que solo contenga elementos válidos
-        """
+    def validateFormulaStructure(self, formula):
         try:
-            formulaLimpia = formula.replace(" ", "")
+            cleanFormula = formula.replace(" ", "")
             
-            if not formulaLimpia:
+            if not cleanFormula:
                 return False
-            
-            # Intentar extraer términos
-            terminos = self.extraerTerminosFormula(formula)
-            if not terminos:
+
+            terms = self.extractFormulaTerms(formula)
+            if not terms:
                 return False
             
             return True
         except Exception:
             return False
     
-    def validarMatricesDisponibles(self, formula):
-        """Valida si todas las matrices de la fórmula están disponibles"""
+    def validateAvailableMatrices(self, formula):
         try:
-            terminos = self.extraerTerminosFormula(formula)
-            if not terminos:
+            terms = self.extractFormulaTerms(formula)
+            if not terms:
                 return False
             
-            for termino in terminos:
-                if termino['matriz'] not in self.matricesDisponibles:
+            for term in terms:
+                if term['matriz'] not in self.availableMatrices:
                     return False
             
             return True
         except Exception:
             return False
     
-    def validarDimensionesCompatibles(self, formula):
-        """Valida si las dimensiones de las matrices son compatibles"""
+    def validateCompatibleDimensions(self, formula):
         try:
-            terminos = self.extraerTerminosFormula(formula)
-            if not terminos:
+            terms = self.extractFormulaTerms(formula)
+            if not terms:
                 return False
+
+            for term in terms:
+                if term.get('inversa', False):
+                    matrix = self.availableMatrices[term['matriz']]
+                    if matrix.shape[0] != matrix.shape[1]:
+                        return False  
             
-            # Primero, verificar que las matrices que se quieren invertir sean cuadradas
-            for termino in terminos:
-                if termino.get('inversa', False):
-                    matriz = self.matricesDisponibles[termino['matriz']]
-                    if matriz.shape[0] != matriz.shape[1]:
-                        return False  # No se puede invertir una matriz no cuadrada
+            firstTerm = terms[0]
+            baseMatrix = self.availableMatrices[firstTerm['matriz']]
             
-            # Calcular dimensión esperada del primer término
-            primerTermino = terminos[0]
-            matrizBase = self.matricesDisponibles[primerTermino['matriz']]
-            
-            if primerTermino.get('inversa', False):
-                dimensionEsperada = matrizBase.shape  # La inversa mantiene las dimensiones
-            elif primerTermino['transpuesta']:
-                dimensionEsperada = (matrizBase.shape[1], matrizBase.shape[0])
+            if firstTerm.get('inversa', False):
+                expectedDimension = baseMatrix.shape  
+            elif firstTerm['transpuesta']:
+                expectedDimension = (baseMatrix.shape[1], baseMatrix.shape[0])
             else:
-                dimensionEsperada = matrizBase.shape
+                expectedDimension = baseMatrix.shape
             
-            # Verificar que todos los términos tengan la misma dimensión
-            for termino in terminos[1:]:
-                matriz = self.matricesDisponibles[termino['matriz']]
+            for term in terms[1:]:
+                matrix = self.availableMatrices[term['matriz']]
                 
-                if termino.get('inversa', False):
-                    dimensionActual = matriz.shape  # La inversa mantiene las dimensiones
-                elif termino['transpuesta']:
-                    dimensionActual = (matriz.shape[1], matriz.shape[0])
+                if term.get('inversa', False):
+                    currentDimension = matrix.shape 
+                elif term['transpuesta']:
+                    currentDimension = (matrix.shape[1], matrix.shape[0])
                 else:
-                    dimensionActual = matriz.shape
+                    currentDimension = matrix.shape
                 
-                if dimensionActual != dimensionEsperada:
+                if currentDimension != expectedDimension:
                     return False
             
             return True
         except Exception:
             return False
     
-    def evaluarFormulaInterna(self, formula):
-        """
-        Evalúa una fórmula internamente usando operaciones elementales
-        """
+    def evaluateInternalFormula(self, formula):
         try:
-            terminos = self.extraerTerminosFormula(formula)
-            if not terminos:
+            terms = self.extractFormulaTerms(formula)
+            if not terms:
                 return False
             
-            resultado = None
+            result = None
             
-            for termino in terminos:
-                # Obtener matriz original
-                matrizOriginal = self.matricesDisponibles[termino['matriz']]
+            for term in terms:
+                originalMatrix = self.availableMatrices[term['matriz']]
                 
-                # Aplicar inversa si es necesario
-                if termino.get('inversa', False):
-                    # Verificar que la matriz inversa sea válida
-                    if not self.operaciones.matrizInversa(matrizOriginal):
+                if term.get('inversa', False):
+                    if not self.operations.matrixInverse(originalMatrix):
                         return False
-                    
-                    # Calcular la inversa
-                    matrizProcesada = self.operaciones.calcularInversa(matrizOriginal)
-                    if matrizProcesada is None:
+ 
+                    processedMatrix = self.operations.calculateInverse(originalMatrix)
+                    if processedMatrix is None:
                         return False
                         
-                # Aplicar transpuesta si es necesario
-                elif termino['transpuesta']:
-                    matrizProcesada = self.operaciones.calcularTranspuesta(matrizOriginal)
+                elif term['transpuesta']:
+                    processedMatrix = self.operations.calculateTranspose(originalMatrix)
                 else:
-                    matrizProcesada = matrizOriginal.copy()
+                    processedMatrix = originalMatrix.copy()
                 
-                # Aplicar multiplicación escalar si es necesario
-                if termino['tieneEscalarExplicito'] or termino['escalar'] != 1.0:
-                    matrizProcesada = self.operaciones.aplicarEscalar(
-                        matrizProcesada, termino['escalar']
+                if term['tieneEscalarExplicito'] or term['escalar'] != 1.0:
+                    processedMatrix = self.operations.applyScalar(
+                        processedMatrix, term['escalar']
                     )
                 
-                # Sumar al resultado
-                if resultado is None:
-                    resultado = matrizProcesada.copy()
+                if result is None:
+                    result = processedMatrix.copy()
                 else:
-                    nuevaSuma = self.operaciones.sumarMatrices(resultado, matrizProcesada)
-                    if nuevaSuma is None:
+                    newSum = self.operations.addMatricesResult(result, processedMatrix)
+                    if newSum is None:
                         return False
-                    resultado = nuevaSuma
+                    result = newSum
             
             return True
         except Exception:
             return False
     
-    # =================== FUNCIÓN PRINCIPAL ===================
-    
-    def validarFormula(self, formula):
-        """
-        Función principal que valida completamente una fórmula
-        """
+    def validateFormula(self, formula):
         try:
-            # 1. Validar estructura
-            if not self.validarEstructuraFormula(formula):
+            if not self.validateFormulaStructure(formula):
                 return False
             
-            # 2. Validar matrices disponibles
-            if not self.validarMatricesDisponibles(formula):
+            if not self.validateAvailableMatrices(formula):
                 return False
             
-            # 3. Validar dimensiones compatibles
-            if not self.validarDimensionesCompatibles(formula):
+            if not self.validateCompatibleDimensions(formula):
                 return False
             
-            # 4. Intentar evaluar la fórmula usando operaciones elementales
-            if not self.evaluarFormulaInterna(formula):
+            if not self.evaluateInternalFormula(formula):
                 return False
             
             return True
         except Exception:
             return False
     
-    # =================== UTILIDADES ===================
-    
-    def obtenerInfoSistema(self):
-        """Retorna información básica del sistema"""
+    def getSystemInfo(self):
         return {
-            'matricesRegistradas': len(self.matricesDisponibles),
-            'nombresMatrices': list(self.matricesDisponibles.keys())
+            'matricesRegistradas': len(self.availableMatrices),
+            'nombresMatrices': list(self.availableMatrices.keys())
         }
     
-    def limpiarMatrices(self):
-        """Limpia todas las matrices registradas"""
-        self.matricesDisponibles.clear()
+    def clearMatrices(self):
+        self.availableMatrices.clear()
         return True 

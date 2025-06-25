@@ -1,247 +1,173 @@
-"""
-Módulo de Operaciones Elementales con Matrices
-Contiene todas las operaciones básicas: suma, resta, multiplicación, 
-transpuesta, inversa, etc.
-"""
 import numpy as np
 import sys
 import os
 
-# Agregar ruta para importar GaussJordan y archiveUtil
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'Repositories'))
 from Repositories.gaussJordan import GaussJordan
 
 
-class OperacionesMatrices:
-    """
-    Clase para realizar operaciones elementales con matrices
-    Implementa las operaciones paso a paso como se hacen a mano
-    """
-    
+class MatrixOperations:
     def __init__(self):
-        self.nombre = "Operaciones Elementales de Matrices"
+        self.name = "Operaciones Elementales de Matrices"
     
-    # =================== OPERACIONES ELEMENTALES PASO A PASO ===================
-    
-    def sumaMatrices(self, matrizA, matrizB):
-        """
-        Suma dos matrices elemento por elemento
-        Algoritmo: resultado[i,j] = A[i,j] + B[i,j]
-        """
+    def addMatrices(self, matrixA, matrixB):
         try:
-            if matrizA.shape != matrizB.shape:
+            if matrixA.shape != matrixB.shape:
                 return False
             
-            filas, columnas = matrizA.shape
-            resultado = np.zeros((filas, columnas))
+            rows, columns = matrixA.shape
+            result = np.zeros((rows, columns))
             
-            # OPERACIÓN ELEMENTAL: bucles anidados
-            for i in range(filas):
-                for j in range(columnas):
-                    resultado[i, j] = matrizA[i, j] + matrizB[i, j]
+            for i in range(rows):
+                for j in range(columns):
+                    result[i, j] = matrixA[i, j] + matrixB[i, j]
             
             return True
         except Exception:
             return False
     
-    def restaMatrices(self, matrizA, matrizB):
-        """
-        Resta dos matrices elemento por elemento  
-        Algoritmo: resultado[i,j] = A[i,j] - B[i,j]
-        """
+    def subtractMatrices(self, matrixA, matrixB):
         try:
-            if matrizA.shape != matrizB.shape:
+            if matrixA.shape != matrixB.shape:
                 return False
             
-            filas, columnas = matrizA.shape
-            resultado = np.zeros((filas, columnas))
+            rows, columns = matrixA.shape
+            result = np.zeros((rows, columns))
             
-            # OPERACIÓN ELEMENTAL: bucles anidados
-            for i in range(filas):
-                for j in range(columnas):
-                    resultado[i, j] = matrizA[i, j] - matrizB[i, j]
-            
-            return True
-        except Exception:
-            return False
-    
-    def multiplicacionEscalar(self, matriz, escalar):
-        """
-        Multiplica cada elemento de la matriz por el escalar
-        Algoritmo: resultado[i,j] = escalar × matriz[i,j]
-        """
-        try:
-            filas, columnas = matriz.shape
-            resultado = np.zeros((filas, columnas))
-            
-            # OPERACIÓN ELEMENTAL: bucles anidados
-            for i in range(filas):
-                for j in range(columnas):
-                    resultado[i, j] = escalar * matriz[i, j]
+            for i in range(rows):
+                for j in range(columns):
+                    result[i, j] = matrixA[i, j] - matrixB[i, j]
             
             return True
         except Exception:
             return False
     
-    def multiplicacionMatrices(self, matrizA, matrizB):
-        """
-        Multiplica dos matrices usando el algoritmo elemental
-        Algoritmo: resultado[i,j] = Σ(A[i,k] × B[k,j]) para k=0 hasta n-1
-        """
+    def scalarMultiplication(self, matrix, scalar):
         try:
-            if matrizA.shape[1] != matrizB.shape[0]:
+            rows, columns = matrix.shape
+            result = np.zeros((rows, columns))
+            
+            for i in range(rows):
+                for j in range(columns):
+                    result[i, j] = scalar * matrix[i, j]
+            
+            return True
+        except Exception:
+            return False
+    
+    def matrixMultiplication(self, matrixA, matrixB):
+        try:
+            if matrixA.shape[1] != matrixB.shape[0]:
                 return False
             
-            filasA, columnasA = matrizA.shape
-            filasB, columnasB = matrizB.shape
-            resultado = np.zeros((filasA, columnasB))
+            rowsA, columnsA = matrixA.shape
+            rowsB, columnsB = matrixB.shape
+            result = np.zeros((rowsA, columnsB))
             
-            # OPERACIÓN ELEMENTAL: triple bucle anidado
-            for i in range(filasA):              # Para cada fila de A
-                for j in range(columnasB):       # Para cada columna de B
-                    suma = 0.0
-                    for k in range(columnasA):   # Suma de productos
-                        suma += matrizA[i, k] * matrizB[k, j]
-                    resultado[i, j] = suma
-            
-            return True
-        except Exception:
-            return False
-    
-    def transpuesta(self, matriz):
-        """
-        Calcula la transpuesta intercambiando filas y columnas
-        Algoritmo: resultado[i,j] = matriz[j,i]
-        """
-        try:
-            filas, columnas = matriz.shape
-            resultado = np.zeros((columnas, filas))
-            
-            # OPERACIÓN ELEMENTAL: intercambio de índices
-            for i in range(filas):
-                for j in range(columnas):
-                    resultado[j, i] = matriz[i, j]
+            for i in range(rowsA):              
+                for j in range(columnsB):      
+                    sum = 0.0
+                    for k in range(columnsA):   
+                        sum += matrixA[i, k] * matrixB[k, j]
+                    result[i, j] = sum
             
             return True
         except Exception:
             return False
     
-    def matrizInversa(self, matriz):
-        """
-        Calcula la matriz inversa usando el método de Gauss-Jordan
-        Algoritmo: [A|I] -> [I|A^-1] mediante eliminación gaussiana
-        Utiliza la clase GaussJordan existente
-        """
+    def transpose(self, matrix):
         try:
-            # Verificar que la matriz sea cuadrada
-            filas, columnas = matriz.shape
-            if filas != columnas:
+            rows, columns = matrix.shape
+            result = np.zeros((columns, rows))
+
+            for i in range(rows):
+                for j in range(columns):
+                    result[j, i] = matrix[i, j]
+            
+            return True
+        except Exception:
+            return False
+    
+    def matrixInverse(self, matrix):
+        try:
+            rows, columns = matrix.shape
+            if rows != columns:
                 return False
             
-            n = filas
+            n = rows
             
-            # Crear matriz identidad del mismo tamaño
-            identidad = np.eye(n)
+            identity = np.eye(n)
             
-            # Crear matriz aumentada [A|I]
-            matrizAumentada = np.hstack((matriz.copy(), identidad))
+            augmentedMatrix = np.hstack((matrix.copy(), identity))
             
-            # Usar la clase GaussJordan existente
             try:
-                solver = GaussJordan(matrizAumentada)
-                # La matriz resultante está en solver.augmentedMatrix
-                matrizResultado = solver.augmentedMatrix
-                
-                # Verificar que la parte izquierda sea la identidad
-                parteIzquierda = matrizResultado[:, :n]
-                if np.allclose(parteIzquierda, np.eye(n), rtol=1e-9, atol=1e-9):
-                    # La operación fue exitosa
-                    # La inversa está en la parte derecha
+                solver = GaussJordan(augmentedMatrix)
+                resultMatrix = solver.augmentedMatrix
+
+                leftPart = resultMatrix[:, :n]
+                if np.allclose(leftPart, np.eye(n), rtol=1e-9, atol=1e-9):
                     return True
                 else:
-                    # La matriz no es invertible
                     return False
                     
             except Exception:
-                # Si GaussJordan lanza una excepción (por ejemplo, pivote cero), 
-                # la matriz no es invertible
                 return False
                 
         except Exception:
             return False
     
-    def calcularTranspuesta(self, matriz):
-        """
-        Calcula y retorna la transpuesta de una matriz
-        """
-        filas, columnas = matriz.shape
-        resultado = np.zeros((columnas, filas))
+    def calculateTranspose(self, matrix):
+        rows, columns = matrix.shape
+        result = np.zeros((columns, rows))
         
-        for i in range(filas):
-            for j in range(columnas):
-                resultado[j, i] = matriz[i, j]
+        for i in range(rows):
+            for j in range(columns):
+                result[j, i] = matrix[i, j]
         
-        return resultado
+        return result
     
-    def calcularInversa(self, matriz):
-        """
-        Calcula y retorna la inversa de una matriz
-        Retorna None si la matriz no es invertible
-        """
-        # Verificar que la matriz sea cuadrada
-        filas, columnas = matriz.shape
-        if filas != columnas:
+    def calculateInverse(self, matrix):
+        rows, columns = matrix.shape
+        if rows != columns:
             return None
         
-        n = filas
-        
-        # Crear matriz identidad del mismo tamaño
-        identidad = np.eye(n)
-        
-        # Crear matriz aumentada [A|I]
-        matrizAumentada = np.hstack((matriz.copy(), identidad))
+        n = rows
+        identity = np.eye(n)
+        augmentedMatrix = np.hstack((matrix.copy(), identity))
         
         try:
-            solver = GaussJordan(matrizAumentada)
-            matrizResultado = solver.augmentedMatrix
-            
-            # Verificar que la parte izquierda sea la identidad
-            parteIzquierda = matrizResultado[:, :n]
-            if np.allclose(parteIzquierda, np.eye(n), rtol=1e-9, atol=1e-9):
-                # Retornar la inversa que está en la parte derecha
-                return matrizResultado[:, n:]
+            solver = GaussJordan(augmentedMatrix)
+            resultMatrix = solver.augmentedMatrix
+            leftPart = resultMatrix[:, :n]
+
+            if np.allclose(leftPart, np.eye(n), rtol=1e-9, atol=1e-9):
+                return resultMatrix[:, n:]
             else:
                 return None
                 
         except Exception:
             return None
     
-    def aplicarEscalar(self, matriz, escalar):
-        """
-        Multiplica una matriz por un escalar y retorna el resultado
-        """
-        filas, columnas = matriz.shape
-        resultado = np.zeros((filas, columnas))
+    def applyScalar(self, matrix, scalar):
+        rows, columns = matrix.shape
+        result = np.zeros((rows, columns))
         
-        for i in range(filas):
-            for j in range(columnas):
-                resultado[i, j] = escalar * matriz[i, j]
+        for i in range(rows):
+            for j in range(columns):
+                result[i, j] = scalar * matrix[i, j]
         
-        return resultado
+        return result
     
-    def sumarMatrices(self, matrizA, matrizB):
-        """
-        Suma dos matrices y retorna el resultado
-        """
-        if matrizA.shape != matrizB.shape:
+    def addMatricesResult(self, matrixA, matrixB):
+        if matrixA.shape != matrixB.shape:
             return None
             
-        filas, columnas = matrizA.shape
-        resultado = np.zeros((filas, columnas))
+        rows, columns = matrixA.shape
+        result = np.zeros((rows, columns))
         
-        for i in range(filas):
-            for j in range(columnas):
-                resultado[i, j] = matrizA[i, j] + matrizB[i, j]
+        for i in range(rows):
+            for j in range(columns):
+                result[i, j] = matrixA[i, j] + matrixB[i, j]
         
-        return resultado 
+        return result 
