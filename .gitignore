@@ -5,3 +5,4 @@
 .venv/
 *.txt
 *.log
+src/Helpers/binFileGenerator.py
