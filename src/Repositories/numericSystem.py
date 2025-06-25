@@ -30,7 +30,7 @@ class numericSystem:
     def processNumericSystem(self):
         num = self.getNumber().replace(',', '.').strip()
 
-        if num == '' or num == '%z':
+        if num == '' or num == '%z'or num == '0':
             self.binSystem = False
             self.decSystem = False
             self.hexSystem = False
@@ -76,11 +76,11 @@ class numericSystem:
             fractional_val = 0
             for i, digit in enumerate(fractional_part):
                 fractional_val += int(digit) * (base ** -(i + 1))
-            self.numberBase10 = sign * float(num_str)
+            self.numberBase10 = integer_val + fractional_val
             
         elif self.decSystem:
             try:
-                self.numberBase10 = sign * float(num_str)
+                self.numberBase10 = sign * float(int(num_str))
             except ValueError:
                 self.numberBase10 = None
                 
@@ -91,7 +91,7 @@ class numericSystem:
             for i, digit in enumerate(fractional_part):
                 digit_val = int(digit, base)
                 fractional_val += digit_val * (base ** -(i + 1))
-            self.numberBase10 = sign * float(num_str)
+            self.numberBase10 = integer_val + fractional_val
         else:
             self.numberBase10 = None
 

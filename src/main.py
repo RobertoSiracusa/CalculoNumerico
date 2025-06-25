@@ -9,7 +9,7 @@ from Repositories.matrixElementalOperation import MatrixOperations
 def main():
     pathToFile = "src/Storage"
     arrayFile1 = 'random_representation_numbers.bin'
-    arrayFile2 = 'random_representation_numbers_2.bin'
+    
 
     try:
         archive = ArchiveUtil.ArchiveUtil(pathToFile)

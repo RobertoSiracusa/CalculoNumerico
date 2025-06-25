@@ -32,7 +32,7 @@ def storeSignificantFigures(dataArray):
                 text= sf.toString()+"\n"+nS.toString()+"\n"+eO.toString()+"\n"+"Numero en Base 10:"+str(nS.getNumberBase10())+"\n"
                 txtWriter(outputFileName,text,True)
             except ValueError as e:
-                logWriter(f"Error procesando '{value}': {e}")
+                logWriter(f"Error procesando '{value}': {e}",True)
                 continue
 
 def storeGaussJordan(dataArray):

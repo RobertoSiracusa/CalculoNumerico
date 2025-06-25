@@ -50,7 +50,7 @@ def processArray(dataArray):
                 
                 dataArray[i, j] = nS.getNumberBase10()
             except ValueError as e:
-                logWriter(f"Error procesando '{value}': {e}")
+                logWriter(f"Error procesando '{value}': {e}",True)
                 continue
     
     
