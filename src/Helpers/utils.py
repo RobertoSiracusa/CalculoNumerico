@@ -12,11 +12,11 @@ def logWriter(content,append_newLine):
     outputLogFileName = f"ErrorLog[{formattedDateTime}_serial{randNum}]:"
     logFileName="ErrorReport"
 
-    archive.setCreateArchiveLog(content,logFileName,outputLogFileName,append_newline)
+    archive.setCreateArchiveLog(content,logFileName,outputLogFileName,append_newLine)
 
-def txtWriter(outputFileName, content, append_newline=True):
+def txtWriter(outputFileName, content, append_newLine=True):
     pathToFile = "src/Storage"
     archive = ArchiveUtil.ArchiveUtil(pathToFile)
 
 
-    archive.setCreateArchiveTxt(content, outputFileName, append_newline)
+    archive.setCreateArchiveTxt(content, outputFileName, append_newLine)

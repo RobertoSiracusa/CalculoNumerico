@@ -5,7 +5,7 @@ from Repositories.significantFigures import significantFigures
 from Repositories.numericSystem import numericSystem
 from Repositories.elementalOperations import elementalOperation
 from Helpers.utils import logWriter, txtWriter
-
+from Repositories.eoNew import elementalOperation
 def storeSignificantFigures(dataArray,basePath):
 
     currentDateTime = datetime.datetime.now()
@@ -14,7 +14,7 @@ def storeSignificantFigures(dataArray,basePath):
     outputFileName = f"InformaciónNumérica_{formattedDateTime}_serial{randNum}"
     
 
-    archiveUtilInstance = ArchiveUtil.ArchiveUtil(basePath)
+    
 
     for i in range(dataArray.shape[0]):
         for j in range(dataArray.shape[1]):
@@ -25,9 +25,9 @@ def storeSignificantFigures(dataArray,basePath):
                 
                 sf = significantFigures(value)
                 nS = numericSystem(value)
-                
-        
-                text= sf.toString()+"\n"+nS.toString()+"\n"
+                eO = elementalOperation(value, nS.binSystem, nS.decSystem, nS.hexSystem)
+
+                text= sf.toString()+"\n"+nS.toString()+"\n"+eO.toString()+"\n"
                 txtWriter(outputFileName,text,True)
             except ValueError as e:
                 print(f"Error procesando '{value}': {e}")

@@ -29,7 +29,16 @@ class ArchiveUtil:
             raise FileNotFoundError("El archivo no se encontro en el directorio especificado.")
         
         return open(fullFilePath, 'rb')
-    
+
+    def setCreateArchiveLog(self, content, logFileName, outputLogFileName, append_newline=False):
+
+        fullFilePath = os.path.join(self._router, f"{logFileName}.log")
+        mode = 'a' if os.path.exists(fullFilePath) else 'w'
+
+        with open(fullFilePath, mode) as file:
+            file.write(outputLogFileName+content) 
+            if append_newline:
+                file.write('\n')
     def setCreateArchiveTxt(self, content, fileName, append_newline=False):
         
         if not content or not content.strip(): 
