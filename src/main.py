@@ -29,7 +29,7 @@ def main():
         matrixChecker = MatrixOperations(dataArrayN1)
         
         storeNumbers.storeGaussJordan(dataArrayN1)
-        pf1.processFormula("matrizA.bin", "matrizB.bin")
+        pf.processFormula("matrizA.bin", "matrizB.bin")
         archive=None
         dataArray1=None
         
