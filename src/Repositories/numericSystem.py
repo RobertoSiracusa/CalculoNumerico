@@ -119,7 +119,7 @@ class numericSystem:
     def getNumber(self):
         return self.number
     def getNumberBase10(self):
-        return self.numberBase10
+        return str(self.numberBase10)
 
     def toString(self):
         return f"El numero {self.number} pertenece a los sistemas numericos: {self.numberSystemInfo()}"

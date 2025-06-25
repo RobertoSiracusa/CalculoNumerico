@@ -158,13 +158,7 @@ class GaussJordan:
                     factor = currentMatrix[i, k]
                     currentMatrix[i, :] = currentMatrix[i, :] - factor * currentMatrix[k, :]
 
-        text = ("\n--- Proceso de Gauss-Jordan finalizado ---")
-        archive.setCreateArchive(text, outputFileName, append_newline=True)
-
-        textMatrixFinal = (f"Representación Final de la Matriz:\n{currentMatrix}")
-        archive.setCreateArchive(textMatrixFinal, outputFileName, append_newline=True)
-
-        solutionValues = None 
+        solutionValues = None
 
         if pivotingType == "completo" and originalColumnOrder is not None: 
             unorderedSolution = currentMatrix[:, -1]

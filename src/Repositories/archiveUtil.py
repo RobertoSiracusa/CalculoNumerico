@@ -50,37 +50,20 @@ class ArchiveUtil:
             if append_newline:
                 file.write('\n')
     def setCreateArchiveTxt(self, content, fileName, append_newline=False):
+
         if not content or not content.strip(): 
-            error_msg = "El contenido es requerido."
-            # Solo hacer log si no estamos ya en proceso de logging (evitar recursión infinita)
-            if booleano or not hasattr(self, '_logging_in_progress'):
-                self._logging_in_progress = True
-                self.logError("ValueError", error_msg)
-                delattr(self, '_logging_in_progress')
-            raise ValueError(error_msg)
+            raise ValueError("El contenido es requerido.")
         if not fileName:
-            error_msg = "El nombre del archivo es requerido."
-            if booleano or not hasattr(self, '_logging_in_progress'):
-                self._logging_in_progress = True
-                self.logError("ValueError", error_msg)
-                delattr(self, '_logging_in_progress')
-            raise ValueError(error_msg)
-        
-        storage_dir = "Storage"
-        if not os.path.exists(storage_dir):
-            os.makedirs(storage_dir)
-            
-        if booleano == True:
-            fullFilePath = os.path.join(self._router, f"{fileName}.txt")
-        else:
-            fullFilePath = os.path.join(storage_dir, "PruebaErrorSystem.log")
-        
+            raise ValueError("El nombre del archivo es requerido.")
+
+        fullFilePath = os.path.join(self._router, f"{fileName}.txt")
         mode = 'a' if os.path.exists(fullFilePath) else 'w'
 
         with open(fullFilePath, mode) as file:
             file.write(content) 
             if append_newline:
                 file.write('\n')
+    
     
     def getDirectories(self):
         if not os.path.exists(self._router):

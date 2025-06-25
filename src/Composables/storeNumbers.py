@@ -26,7 +26,7 @@ def storeSignificantFigures(dataArray,basePath):
                 nS = numericSystem(value)
                 eO = elementalOperation(value, nS.binSystem, nS.decSystem, nS.hexSystem)
 
-                text= sf.toString()+"\n"+nS.toString()+"\n"+eO.toString()+"\n"
+                text= sf.toString()+"\n"+nS.toString()+"\n"+eO.toString()+"\n"+nS.getNumberBase10()+"\n"
                 txtWriter(outputFileName,text,True)
             except ValueError as e:
                 print(f"Error procesando '{value}': {e}")
