@@ -31,7 +31,7 @@ def main():
 
         archive=None
         dataArray1=None
-        matrixChecker
+        
     except Exception as e:
         logWriter("Error al procesar archivo: " + str(e), True)
         

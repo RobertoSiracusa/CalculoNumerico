@@ -93,7 +93,7 @@ class numericSystem:
                 fractional_val += digit_val * (base ** -(i + 1))
             self.numberBase10 = integer_val + fractional_val
         else:
-            self.numberBase10 = None
+            self.numberBase10 = 0
 
     #setters
     def setBinSystem(self,req:bool):
