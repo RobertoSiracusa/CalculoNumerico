@@ -1,5 +1,6 @@
 import numpy as np
 
+from Helpers.utils import logWriter
 from Repositories.significantFigures import significantFigures
 from Repositories.numericSystem import numericSystem
 
@@ -36,8 +37,25 @@ def initArray(binaryContent):
     
     return dataArray
 
+def processArray(dataArray):
+
+    for i in range(dataArray.shape[0]):
+        for j in range(dataArray.shape[1]):
+            value = dataArray[i, j]
+            if value == "%z":
+                value="0"  
+                continue
+            try:
+                nS = numericSystem(value)
+                
+                dataArray[i, j] = nS.getNumberBase10()
+            except ValueError as e:
+                logWriter(f"Error procesando '{value}': {e}")
+                continue
     
-            
+    
+    return dataArray    
+        
             
 
     

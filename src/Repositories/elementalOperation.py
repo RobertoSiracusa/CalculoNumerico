@@ -19,12 +19,12 @@ class elementalOperation:
         if self.hexSystem==True:
             self._detHexOperation()
         if not self.decSystem and not self.binSystem and not self.hexSystem:
-            logWriter("ERROR:El numero no es un numero válido en ningun sistema.", True)
+            logWriter("ERROR:El numero no es un numero valido en ningun sistema.", True)
             self.elementalOperationResult = "No hay operaciones disponibles para el numero proporcionado."
     def _detHexOperation(self):
         hexNumber= self.numberString.replace(',', '.').strip()
         if not self.hexSystem:
-            logWriter("ERROR:El numero no es un numero hexadecimal válido.", True)
+            logWriter("ERROR:El numero no es un numero hexadecimal valido.", True)
             return
         if hexNumber == '0' or hexNumber == '0.0':
             logWriter("ERROR:No hay operaciones disponibles para el numero 0.",True)
@@ -92,27 +92,36 @@ class elementalOperation:
             return False
     def _detBinOperation(self):
         binNumber= self.numberString.replace(',', '.').strip()
-        if not self.binSystem:
-            logWriter("ERROR:El numero no es un numero binario válido.", True)
-            return
-        if binNumber == '0' or binNumber == '0.0':
+        # Validar si el numero es binario
+        if not all(char in '01.' for char in binNumber):
+            self.binSystem = False
+            logWriter("ERROR:El numero no es un numero binario valido.", True)
+            
+        elif not self.binSystem:
+            logWriter("ERROR:El numero no es un numero binario valido.", True)
+            
+        elif binNumber == '0' or binNumber == '0.0':
             logWriter("ERROR:No hay operaciones disponibles para el numero 0.",True)
-            return
-        output = f"Operaciones disponibles para el numero en base binaria {binNumber}:\n"
-        sum= self.binSum()
-        sub= self.binSubtraction()
-        mult= self.binMultiplication()
-        div= self.binDivision()
-        if sum==True:
-            output=output + "Suma"
-        if sub==True:
-            output+= "Resta."
-        if mult==True:
-            output += "Multiplicacion,"
-        if div==True:
-            output += "Division."
-        output += "\t"
-        self.elementalOperationResult = output
+            
+        else:
+            parts = binNumber.split('.', 1)
+            integerPart = parts[0]
+            self.numberString = integerPart
+            output = f"Operaciones disponibles para el numero en base binaria {binNumber}:\n"
+            sum= self.binSum()
+            sub= self.binSubtraction()
+            mult= self.binMultiplication()
+            div= self.binDivision()
+            if sum==True:
+                output=output + "Suma"
+            if sub==True:
+                output+= "Resta."
+            if mult==True:
+                output += "Multiplicacion,"
+            if div==True:
+                output += "Division."
+            output += "\t"
+            self.elementalOperationResult = output
     def binSum(self):
         binNumber= self.numberString.replace(',', '.').strip()
         
@@ -148,7 +157,7 @@ class elementalOperation:
                 result = result* 1
             return True
         except Exception as e:
-            logWriter(f"Error en la multiplicación binaria: {e}", True)
+            logWriter(f"Error en la multiplicacion binaria: {e}", True)
             return False
     def binDivision(self):
         binNumber= self.numberString.replace(',', '.').strip()
@@ -160,14 +169,14 @@ class elementalOperation:
                 result = result/ 1
             return True
         except Exception as e:
-            logWriter(f"Error en la división binaria: {e}", True)
+            logWriter(f"Error en la division binaria: {e}", True)
             return False
     
 
     def _detDecOperation(self):
         decNumber= self.numberString.replace(',', '.').strip()
         if not self.decSystem:
-            logWriter("ERROR:El numero no es un numero decimal válido.", True)
+            logWriter("ERROR:El numero no es un numero decimal valido.", True)
             return
         if decNumber == '0' or decNumber == '0.0':
             logWriter("ERROR:No hay operaciones disponibles para el numero 0.",True)
@@ -227,33 +236,23 @@ class elementalOperation:
                 result = result* 1
             return True
         except Exception as e:
-            logWriter(f"Error en la multiplicación decimal: {e}", True)
+            logWriter(f"Error en la multiplicacion decimal: {e}", True)
             return False
     def decDivision(self):
-        decNumber= self.numberString.replace(',', '.').strip()
+        decNumber = self.numberString.replace(',', '.').strip()
         
         try:
-            decNumber=float(decNumber)
+            decNumber = float(decNumber)
             result = 1
-            for i in range(0,int(decNumber)):
-                result = result/ 1
-            return True
-        except Exception as e:
-            logWriter(f"Error en la división decimal: {e}", True)
-            return False
 
-        binNumber = self.numberString.replace(',', '.').strip()
-        
-        try:
-            binNumber = float(binNumber, 2)
-            result = 1
-            
-            for i in range(0, binNumber):
+            for i in range(int(decNumber)):
                 result = result / 1
             return True
         except Exception as e:
-            logWriter(f"Error en la división binaria: {e}", True)
+            logWriter(f"Error en la division decimal: {e}", True)
             return False
+
+       
         
     def toString(self):
         if self.elementalOperationResult == "":

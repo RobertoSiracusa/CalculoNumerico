@@ -1,28 +1,26 @@
 import numpy as np
-from archiveUtil import ArchiveUtil
+
+from Helpers.utils import logWriter
 
 class GaussJordan:
     def __init__(self, augmentedMatrix: np.ndarray):  
         if not isinstance(augmentedMatrix, np.ndarray):
             errorMsg = "El parámetro 'augmentedMatrix' debe ser un array de NumPy (np.ndarray)."
-            ArchiveUtil.logError("TypeError", errorMsg, "")
-            raise TypeError(errorMsg)
+            logWriter( errorMsg,True)
         
         if augmentedMatrix.ndim != 2:
             errorMsg = "La matriz aumentada debe ser bidimensional (Ejemplo: forma (filas, columnas))."
-            ArchiveUtil.logError("ValueError", errorMsg, "")
-            raise ValueError(errorMsg)
-        
+            logWriter( errorMsg,True)
+
+
         if augmentedMatrix.size == 0 or augmentedMatrix.shape[0] == 0:
             errorMsg = "La matriz aumentada no debe estar vacía (debe tener al menos una fila)."
-            ArchiveUtil.logError("ValueError", errorMsg, "")
-            raise ValueError(errorMsg)
-        
+            logWriter( errorMsg,True)
+
+
         if augmentedMatrix.shape[1] < 2:
             errorMsg = "La matriz aumentada debe tener al menos 2 columnas (matriz de coeficientes A y vector de términos independientes b)."
-            ArchiveUtil.logError("ValueError", errorMsg, "")
-            raise ValueError(errorMsg)
-
+            logWriter( errorMsg,True)
 
         self.augmentedMatrix = augmentedMatrix.astype(float)
         self.nRows, self.nCols = self.augmentedMatrix.shape
@@ -30,18 +28,19 @@ class GaussJordan:
         self.y = None
         self.z = None
         self.solutionStringsDict = {} 
-        self.rawSolutionValues = None 
+        self.rawSolutionValues = None
+        self.finalSolution = "No resuelto"
         self.resolveMatrix()
 
         # Advertencias sobre el tamaño del sistema
         if self.nRows > self.nCols - 1:
-            errorMsg = "El sistema puede estar sobredeterminado o no tener solución única."
-            ArchiveUtil.logError("Tamaño del Sistema", errorMsg, "")
+            errorMsg = "El sistema puede estar sobredeterminado o no tener solucion unica."
+            logWriter(errorMsg,True)
             print(errorMsg)
         if self.nRows < self.nCols - 1:
             errorMsg = "El sistema puede tener infinitas soluciones o ser indeterminado."
-            ArchiveUtil.logError("Infinitas Soluciones", errorMsg, "")
-            print(errorMsg)
+            logWriter(errorMsg,True)
+            
 
         np.set_printoptions(precision=4, suppress=False)
 
@@ -109,9 +108,6 @@ class GaussJordan:
         return augmentedMatrix
 
     def resolveMatrix(self, pivotingType: str = "parcial") -> np.ndarray | None:
-        pathToFile = "src/Storage"
-        archive = ArchiveUtil(pathToFile)
-        outputFileName = "GaussJordan"
 
         currentMatrix = self.augmentedMatrix
         
@@ -122,12 +118,6 @@ class GaussJordan:
         self.rawSolutionValues = None
 
         originalColumnOrder = np.arange(self.nCols - 1) if pivotingType == "full" else None
-
-        text = (f"\n--- Comenzando Gauss-Jordan con Pivoteo {pivotingType.capitalize()} ---")
-        archive.setCreateArchive(text, outputFileName, append_newline=True)
-
-        textMatrix = (f"Matriz Inicial:\n{currentMatrix}") 
-        archive.setCreateArchive(textMatrix, outputFileName, append_newline=True)
 
         for k in range(self.nRows):
             if pivotingType == "parcial":
@@ -140,17 +130,15 @@ class GaussJordan:
             elif pivotingType == "escalonado":
                 currentMatrix = self.scaledPivoting(currentMatrix, k)
             elif pivotingType != "none":
-                errorMsg = "Tipo de pivoteo '{pivotingType}' no reconocido. No se aplicara el pivoteo"
-                ArchiveUtil.logError("ValueError", errorMsg, "")
-                raise ValueError(errorMsg)
-                
+                errorMsg = f"Tipo de pivoteo '{pivotingType}' no reconocido. No se aplicara el pivoteo"
+                logWriter(errorMsg,True)
+
             pivot = currentMatrix[k, k]
 
             if abs(pivot) < 1e-9: 
-                errorMsg = "Error: Pivote igual a cero o casi cero en la fila {k} después del pivoteo. El sistema podría no tener una solución única o ser inconsistente."
-                ArchiveUtil.logError("ValueError", errorMsg, "")
-                raise ValueError(errorMsg)
-            
+                errorMsg = f"Error: Pivote igual a cero o casi cero en la fila {k} despues del pivoteo. El sistema podria no tener una solucion unica o ser inconsistente."
+                logWriter(errorMsg,True)
+
             currentMatrix[k, :] = currentMatrix[k, :] / pivot
 
             for i in range(self.nRows):
@@ -180,7 +168,7 @@ class GaussJordan:
             self.solutionStringsDict['z'] = self.z
 
             finalSolutionForTxt = (
-                f"\Solucion:\n"
+                f"Solucion del sistema de ecuaciones:\n"
                 f"{self.x}, "
                 f"{self.y}, "
                 f"{self.z}"
@@ -190,13 +178,18 @@ class GaussJordan:
             self.y = "No aplicable (menos de 3 vars)"
             self.z = "No aplicable (menos de 3 vars)"
             self.solutionStringsDict.clear()
-            finalSolutionForTxt = "\nSolución: No hay suficientes variables (se esperaban 3 para x, y, z)"
+            finalSolutionForTxt = "Solucion: No hay suficientes variables (se esperaban 3 para x, y, z)"
 
-        archive.setCreateArchive(finalSolutionForTxt, outputFileName, append_newline=True)
+        self.finalSolution = finalSolutionForTxt
         
         return currentMatrix
-#---------------- EJEMPLO DE USO ----------------
+    
+    def getSolution(self) -> str:
+        if self.finalSolution == "No resuelto":
+            return "El sistema no ha sido resuelto."
+        return self.finalSolution
 
+"""
 def main():
     print("\n========== EXAMPLE 1: Partial Pivoting (Standard Case) ==========")
     A1 = np.array([
@@ -252,3 +245,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+"""

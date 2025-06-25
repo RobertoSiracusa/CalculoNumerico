@@ -76,7 +76,7 @@ class numericSystem:
             fractional_val = 0
             for i, digit in enumerate(fractional_part):
                 fractional_val += int(digit) * (base ** -(i + 1))
-            self.numberBase10 = sign * (integer_val + fractional_val)
+            self.numberBase10 = sign * float(num_str)
             
         elif self.decSystem:
             try:
@@ -91,7 +91,7 @@ class numericSystem:
             for i, digit in enumerate(fractional_part):
                 digit_val = int(digit, base)
                 fractional_val += digit_val * (base ** -(i + 1))
-            self.numberBase10 = sign * (integer_val + fractional_val)
+            self.numberBase10 = sign * float(num_str)
         else:
             self.numberBase10 = None
 
@@ -119,7 +119,7 @@ class numericSystem:
     def getNumber(self):
         return self.number
     def getNumberBase10(self):
-        return str(self.numberBase10)
+        return (self.numberBase10)
 
     def toString(self):
         return f"El numero {self.number} pertenece a los sistemas numericos: {self.numberSystemInfo()}"
