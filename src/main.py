@@ -4,7 +4,7 @@ from Helpers.utils import logWriter
 import Process.ProcessFunctions as pf
 import Repositories.archiveUtil as ArchiveUtil
 import Composables.storeNumbers as storeNumbers
-
+from Repositories.matrixElementalOperation import MatrixOperations
 
 def main():
     pathToFile = "src/Storage"
@@ -24,7 +24,9 @@ def main():
         storeNumbers.storeSignificantFigures(dataArrayN1)
 
         dataArrayN1 = pf.processArray(dataArrayN1)
-        
+
+        matrixChecker = MatrixOperations(dataArrayN1)
+
         storeNumbers.storeGaussJordan(dataArrayN1)
 
         
