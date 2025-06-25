@@ -76,15 +76,13 @@ class numericSystem:
             fractional_val = 0
             for i, digit in enumerate(fractional_part):
                 fractional_val += int(digit) * (base ** -(i + 1))
-            self.numberBase10 = integer_val + fractional_val
+            self.numberBase10 = sign * float(num_str)
             
         elif self.decSystem:
-            base = 10
-            integer_val = int(integer_part, base) if integer_part else 0
-            fractional_val = 0
-            for i, digit in enumerate(fractional_part):
-                fractional_val += int(digit) * (base ** -(i + 1))
-            self.numberBase10 = integer_val + fractional_val
+            try:
+                self.numberBase10 = sign * float(num_str)
+            except ValueError:
+                self.numberBase10 = None
                 
         elif self.hexSystem:
             base = 16
