@@ -26,9 +26,9 @@ class MatrixOperations:
 
     def addMatrices(self):
         try:
-            # Usar la matriz del atributo como A y B
+            
             matrixA = self.matriz
-            matrixB = self.matriz  # B = A según condiciones
+            matrixB = self.matriz  
             
             if matrixA.shape != matrixB.shape:
                 errorMsg = "Error: No se puede realizar la suma de las matrices - dimensiones incompatibles"
@@ -50,9 +50,9 @@ class MatrixOperations:
     
     def subtractMatrices(self):
         try:
-            # Usar la matriz del atributo como A y B
+            
             matrixA = self.matriz
-            matrixB = self.matriz  # B = A según condiciones
+            matrixB = self.matriz  
             
             if matrixA.shape != matrixB.shape:
                 errorMsg = "Error: No se puede realizar la resta de las matrices - dimensiones incompatibles"
@@ -74,7 +74,7 @@ class MatrixOperations:
     
     def scalarMultiplication(self):
         try:
-            # Usar escalar = 2 según condiciones
+            
             scalar = 2
             matrix = self.matriz
             
@@ -93,9 +93,9 @@ class MatrixOperations:
     
     def matrixMultiplication(self):
         try:
-            # Usar la matriz del atributo como A y B
+            
             matrixA = self.matriz
-            matrixB = self.matriz  # B = A según condiciones
+            matrixB = self.matriz  
             
             if matrixA.shape[1] != matrixB.shape[0]:
                 errorMsg = "Error: No se puede realizar la multiplicacion de matrices - dimensiones incompatibles"
@@ -222,7 +222,7 @@ class MatrixOperations:
     
     def applyScalar(self):
         try:
-            # Usar escalar = 2 según condiciones
+            
             scalar = 2
             matrix = self.matriz
             
@@ -241,9 +241,9 @@ class MatrixOperations:
     
     def addMatricesResult(self):
         try:
-            # Usar la matriz del atributo como A y B
+            
             matrixA = self.matriz
-            matrixB = self.matriz  # B = A según condiciones
+            matrixB = self.matriz  
             
             if matrixA.shape != matrixB.shape:
                 errorMsg = "Error: No se puede realizar la suma - dimensiones incompatibles"
@@ -264,7 +264,7 @@ class MatrixOperations:
             return None
     
     def getMatrix(self):
-        """Método para obtener la matriz actual"""
+        
         try:
             return self.matriz.copy()
         except Exception as e:
@@ -273,5 +273,5 @@ class MatrixOperations:
             return None
     
     def setMatrix(self, newMatrix):
-        """Método para actualizar la matriz"""
-        self.matriz = newMatrix 
+        
+        self.matriz = newMatrix
