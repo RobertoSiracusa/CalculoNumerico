@@ -1,6 +1,7 @@
 
 
 from Helpers.utils import logWriter
+
 import Process.ProcessFunctions as pf
 import Repositories.archiveUtil as ArchiveUtil
 import Composables.storeNumbers as storeNumbers
@@ -26,9 +27,9 @@ def main():
         dataArrayN1 = pf.processArray(dataArrayN1)
 
         matrixChecker = MatrixOperations(dataArrayN1)
-
+        
         storeNumbers.storeGaussJordan(dataArrayN1)
-
+        pf1.processFormula("matrizA.bin", "matrizB.bin")
         archive=None
         dataArray1=None
         
