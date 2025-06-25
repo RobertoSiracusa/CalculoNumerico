@@ -3,9 +3,8 @@ import random
 import Repositories.archiveUtil as ArchiveUtil
 from Repositories.significantFigures import significantFigures
 from Repositories.numericSystem import numericSystem
-from Repositories.elementalOperations import elementalOperation
 from Helpers.utils import logWriter, txtWriter
-from Repositories.eoNew import elementalOperation
+from Repositories.elementalOperation import elementalOperation
 def storeSignificantFigures(dataArray,basePath):
 
     currentDateTime = datetime.datetime.now()
